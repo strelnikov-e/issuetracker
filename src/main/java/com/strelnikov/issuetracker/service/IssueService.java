@@ -1,8 +1,10 @@
 package com.strelnikov.issuetracker.service;
 
 import com.strelnikov.issuetracker.entity.Issue;
+import com.strelnikov.issuetracker.entity.IssueStatus;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IssueService {
 
@@ -10,7 +12,7 @@ public interface IssueService {
 
     void deleteById(Long issueId);
 
-    Issue create(Issue issue, Long projectId);
+    Issue create(Issue issue);
 
     Issue update(Long issueId, Issue requestIssue);
 
@@ -19,4 +21,10 @@ public interface IssueService {
     List<Issue> findByName(String name);
 
     List<Issue> findByProjectId(Long projectId);
+
+    Issue patch(Long issueId, Map<String, Object> fields);
+
+    List<Issue> findAll();
+
+    List<Issue> findByStatus(IssueStatus status);
 }

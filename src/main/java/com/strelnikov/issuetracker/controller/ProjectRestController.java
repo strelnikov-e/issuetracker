@@ -3,6 +3,7 @@ package com.strelnikov.issuetracker.controller;
 import com.strelnikov.issuetracker.entity.Project;
 import com.strelnikov.issuetracker.exception.ProjectNotFoundException;
 import com.strelnikov.issuetracker.service.ProjectService;
+import jakarta.validation.Valid;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -17,6 +18,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api")
+//@CrossOrigin("http://localhost:3000")
 public class ProjectRestController {
 
     private ProjectService projectService;
@@ -26,6 +28,13 @@ public class ProjectRestController {
         this.projectService = projectService;
         this.assembler = assembler;
     }
+
+//    // Get all projects of current user
+//    @GetMapping("/projects")
+//    public List<Project> all(@RequestParam(value = "name", defaultValue = "", required = false) String name) {
+//        List<Project> projects = projectService.findByName(name);
+//        return projects;
+//    }
 
     // Get all projects of current user
     @GetMapping("/projects")
@@ -48,7 +57,7 @@ public class ProjectRestController {
 
     // Create new project and set project admin to current user
     @PostMapping("/projects")
-    public ResponseEntity<?> createProject(@RequestBody Project project) {
+    public ResponseEntity<?> createProject(@Valid @RequestBody Project project) {
         EntityModel<Project> entityModel = assembler.toModel(projectService.create(project));
         return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
     }
@@ -68,5 +77,10 @@ public class ProjectRestController {
         return ResponseEntity.noContent().build();
     }
 
+//    @GetMapping("/project/{projectId}/status")
+//    public Set<IssueStatus> status(@PathVariable Long projectId) {
+//        Set<IssueStatus> statuses = projectService.findById(projectId).getIssueStatuses();
+//        return statuses;
+//    }
 
 }

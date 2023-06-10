@@ -1,7 +1,8 @@
 package com.strelnikov.issuetracker.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.hibernate.Hibernate;
 
 import java.time.LocalDate;
@@ -17,11 +18,15 @@ public class Issue {
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private Long id;
 
+	@NotNull()
+	@NotBlank(message = "name field cannot be empty")
 	private String name;
+
+	@Column(name = "issue_key")
+	private String key;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "project_id")
-	@JsonIgnore
 	private Project project;
 
 	private String description;
@@ -29,10 +34,23 @@ public class Issue {
 	private Long assignee;
 
 	@Column(columnDefinition = "char")
-	private String status;
+	private IssueStatus status = IssueStatus.TODO;
+
+	@Column(columnDefinition = "char")
+	private IssueType type;
+
+	@Column(columnDefinition = "char")
+	private IssuePriority priority;
 
 	@Column(name="start_date")
 	private LocalDate startDate;
+
+	@Column(name="due_date")
+	private LocalDate dueDate;
+
+	@Column(name="close_date")
+	private LocalDate closeDate;
+
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
 	@JoinTable(name = "issues_tags",
@@ -42,16 +60,26 @@ public class Issue {
 
 
 	public Issue() {
-		
 	}
 
-	public Issue(String name, Project project, String description, Long assignee, String status, LocalDate startDate) {
+	public Issue(String name, Project project, String description, Long assignee,
+				 IssueStatus status, IssueType type, IssuePriority priority,
+				 LocalDate startDate, LocalDate dueDate, LocalDate closeDate, String key) {
 		this.name = name;
 		this.project = project;
 		this.description = description;
 		this.assignee = assignee;
 		this.status = status;
+		this.type = type;
+		this.priority = priority;
 		this.startDate = startDate;
+		this.dueDate = dueDate;
+		this.closeDate = closeDate;
+		generateKey(name);
+	}
+
+	public void generateKey(String name) {
+		this.key = project.getKey() + "-" + project.increaseIssueCounter();
 	}
 
 	public void removeTag(Long tagId) {
@@ -85,16 +113,21 @@ public class Issue {
 		return this.id != 0L && Objects.equals(this.id, that.id);
 	}
 
-	@java.lang.Override
-	public java.lang.String toString() {
+	@Override
+	public String toString() {
 		return "Issue{" +
 				"id=" + id +
-				", name='" + name + '\'' +
+				", name='" + name +
 				", project=" + project +
-				", description='" + description + '\'' +
-				", assignee='" + assignee + '\'' +
-				", status='" + status + '\'' +
+				", description='" + description +
+				", assignee=" + assignee +
+				", status=" + status +
+				", type=" + type +
+				", priority=" + priority +
 				", startDate=" + startDate +
+				", dueDate=" + dueDate +
+				", closeDate=" + closeDate +
+				", key='" + key  +
 				", tags=" + tags +
 				'}';
 	}
@@ -139,12 +172,12 @@ public class Issue {
 		this.assignee = assignee;
 	}
 
-	public String getStatus() {
+	public IssueStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
+	public void setStatus(IssueStatus issueStatus) {
+		this.status = issueStatus;
 	}
 
 	public LocalDate getStartDate() {
@@ -153,6 +186,46 @@ public class Issue {
 
 	public void setStartDate(LocalDate startDate) {
 		this.startDate = startDate;
+	}
+
+	public IssueType getType() {
+		return type;
+	}
+
+	public void setType(IssueType type) {
+		this.type = type;
+	}
+
+	public IssuePriority getPriority() {
+		return priority;
+	}
+
+	public void setPriority(IssuePriority priority) {
+		this.priority = priority;
+	}
+
+	public LocalDate getDueDate() {
+		return dueDate;
+	}
+
+	public void setDueDate(LocalDate dueDate) {
+		this.dueDate = dueDate;
+	}
+
+	public LocalDate getCloseDate() {
+		return closeDate;
+	}
+
+	public void setCloseDate(LocalDate closeDate) {
+		this.closeDate = closeDate;
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
 	}
 
 	public Set<Tag> getTags() {

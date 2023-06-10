@@ -3,17 +3,18 @@ use `issuetracker`;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
-DROP TABLE IF EXISTS `users`;
-
 DROP TABLE IF EXISTS `projects`;
 
 create table `projects` 
 (
 `id` bigint not null auto_increment,
 `name` varchar(50) not null,
+`project_key` varchar(16),
 `description` text,
-`status` char(4) default "OPEN",
+`manager` bigint,
 `start_date` date,
+`url` varchar(256),
+`issue_count` int,
 PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
@@ -22,21 +23,20 @@ DROP TABLE IF EXISTS `issues`;
 create table `issues` 
 (
 `id` bigint not null auto_increment,
+`issue_key` varchar(24),
 `name` varchar(50) not null,
 `description` varchar(256),
 `assignee` bigint,
-`status` char(4) default "OPEN",
+`status` char(1),
+`type` char(1),
+`priority` char(1),
 `start_date` date,
+`due_date` date,
+`close_date` date,
 `project_id` bigint,
 PRIMARY KEY (`id`),
 CONSTRAINT `FK_issues_project_id` FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
-
-DROP TABLE IF EXISTS `users_roles`;
-
-DROP TABLE IF EXISTS `projects_roles`;
-
-DROP TABLE IF EXISTS `issues_roles`;
 
 DROP TABLE IF EXISTS `tags`;
 

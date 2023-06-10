@@ -2,13 +2,13 @@ package com.strelnikov.issuetracker.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.hibernate.Hibernate;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 @Table(name="projects")
@@ -16,35 +16,65 @@ public class Project {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column
+    @NotNull
+    @NotBlank(message = "Name cannot be blank")
     private String name;
+
+    @Column(name="project_key")
+    private String key;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "project")
     @JsonIgnore
     private List<Issue> issues = new ArrayList<>();
 
-    @Column
+    @Column(name = "description")
     private String description;
 
-    @Column(columnDefinition = "char")
-    private String status;
+    @Column(name = "manager")
+    private Long manager;
 
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     @Column(name="start_date")
     private LocalDate startDate;
 
-    public Project() {
+    @Column
+    private String url;
 
+    @Column(name = "issue_count")
+    private Integer issueCount = 0;
+
+//    @Column(name = "issue_status_list")
+//    private Set<IssueStatus> issueStatuses = Set.of(IssueStatus.TODO, IssueStatus.INPROGRESS, IssueStatus.INREVIEW, IssueStatus.DONE);;
+
+    public Project() {
     }
 
-    public Project(String name, List<Issue> issues, String description, String status, LocalDate startDate) {
+    public Project(String name, String key, List<Issue> issues, String description,
+                   Long manager, LocalDate startDate, String url) {
         this.name = name;
         this.issues = issues;
         this.description = description;
-        this.status = status;
+        this.manager = manager;
         this.startDate = startDate;
+        this.url = url;
+        this.key = key;
+//        if (key != null) {
+//            System.out.println("key equals null");
+//            this.key = key;
+//        } else {
+//            System.out.println("key equals null");
+//            this.key = generateKey(name);
+//            System.out.println(key);
+//        }
+    }
+
+    public String generateKey(String name) {
+        return Arrays.stream(name.split(" "))
+                .reduce("",(accumulator, word) -> accumulator + word.charAt(0))
+                .toUpperCase();
     }
 
     @Override
@@ -63,21 +93,23 @@ public class Project {
     }
 
     @Override
-    public java.lang.String toString() {
+    public String toString() {
         return "Project{" +
                 "id=" + id +
+                ", key='" + key + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", status='" + status + '\'' +
+                ", manager=" + manager +
                 ", startDate=" + startDate +
+                ", url='" + url + '\'' +
                 '}';
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -105,14 +137,6 @@ public class Project {
         this.description = description;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public LocalDate getStartDate() {
         return startDate;
     }
@@ -120,5 +144,59 @@ public class Project {
     public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public Long getManager() {
+        return manager;
+    }
+
+    public void setManager(Long manager) {
+        this.manager = manager;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public Integer getIssueCount() {
+        return issueCount;
+    }
+
+    public void setIssueCount(Integer issueCount) {
+        if (issueCount != null) {
+            this.issueCount = issueCount;
+        }
+    }
+
+    public int increaseIssueCounter() {
+        return ++this.issueCount;
+    }
+//
+//    public Set<IssueStatus> getIssueStatuses() {
+//        return issueStatuses;
+//    }
+//
+//    public void setIssueStatuses(Set<IssueStatus> issueStatuses) {
+//        this.issueStatuses = issueStatuses;
+//    }
+//
+//    public boolean addIssueStatus(IssueStatus status) {
+//           return this.issueStatuses.add(status);
+//    }
+//
+//    public boolean removeIssueStatus(IssueStatus status) {
+//        return this.issueStatuses.remove(status);
+//    }
 }
 

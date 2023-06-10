@@ -1,6 +1,7 @@
 package com.strelnikov.issuetracker.repository;
 
 import com.strelnikov.issuetracker.entity.Issue;
+import com.strelnikov.issuetracker.entity.IssueStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Collection;
@@ -18,4 +19,6 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
 
 
     List<Issue> findByNameContaining(String name);
+
+    List<Issue> findByStatus(IssueStatus status);
 }

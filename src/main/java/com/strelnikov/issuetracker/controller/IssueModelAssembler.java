@@ -5,6 +5,8 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -14,7 +16,7 @@ public class IssueModelAssembler implements RepresentationModelAssembler<Issue, 
     public EntityModel<Issue> toModel(Issue issue) {
         return EntityModel.of(issue,
                 linkTo(methodOn(IssueRestController.class).getById(issue.getId())).withSelfRel(),
-                linkTo(methodOn(IssueRestController.class).all(0L,"")).withRel("issues"));
+                linkTo(methodOn(IssueRestController.class).all(new HashMap<>())).withRel("issues"));
 
     }
 }

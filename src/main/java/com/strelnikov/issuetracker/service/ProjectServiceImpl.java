@@ -12,8 +12,8 @@ import java.util.List;
 @Service
 public class ProjectServiceImpl implements ProjectService {
 
-    private ProjectRepository projectRepository;
-    private IssueService issueService;
+    private final ProjectRepository projectRepository;
+    private final IssueService issueService;
 
     public ProjectServiceImpl(ProjectRepository projectRepository, IssueService issueService) {
         this.projectRepository = projectRepository;
@@ -38,9 +38,13 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public Project create(Project project) {
+        System.out.println("create project " + project );
         project.setId(0L);
-        Project newProject = projectRepository.save(project);
-        return newProject;
+        if (project.getKey() == null || project.getKey().isEmpty()) {
+            System.out.println("ket is null " + project.getKey());
+            project.setKey(project.generateKey(project.getName()));
+        }
+        return projectRepository.save(project);
     }
 
     @Override

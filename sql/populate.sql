@@ -1,33 +1,35 @@
 use `issuetracker`;
 
 SET FOREIGN_KEY_CHECKS = 0;
-
-INSERT INTO `projects` (`name`,`description`,`status`,`start_date`)
+INSERT INTO `projects` (`project_key`, `name`,`description`,`start_date`, `issue_count`)
 VALUES
-        ("Bugtracker",
+        ("BT","Bugtracker",
         "Training project with minimal functionality to track project issues and plan development process",
-        "PROG","2023-04-11"),
-        ("Blog",
+        "2023-04-11", 3),
+        ("BLOG","Blog",
         "Demo blog project",
-        "OPEN","2023-04-22");
+        "2023-04-22", 2);
         
-INSERT INTO `issues` (`name`,`description`,`assignee`,`status`,`start_date`,`project_id`)
+INSERT INTO `issues` (`issue_key`, `name`,`description`,`assignee`,`status`, `type`, `priority`, `start_date`,`project_id`)
 VALUES
-        ("Create issues database",
+        ("BT-1", "Create issues database",
         "Develop a database with field required to account issues for a specific project",
-        "1","OPEN","2023-04-11",1),
-        ("Create projects database",
+        "1","R", "T", "H","2023-04-12",1),
+        ("BT-2", "Create projects database",
         "Develop a database with field required to account projects for an user",
-        1,"OPEN","2023-04-11",1),
-        ("Create users database",
+        1,"P", "T", "H","2023-04-16",1),
+        ("BT-3","Create users database",
         "Develop a database with user specific information",
-        2,"OPEN","2023-04-11",1),
-        ("Create users database",
+        2,"P", "T", "L", "2023-05-02",1),
+        ("BT-4","Design an UI",
+        "Design a basic UI",
+        2,"P", "T", "M", "2023-05-20",1),
+        ("BLOG-1", "Create users database",
         "Develop a database with user specific information for blog",
-        1,"OPEN","2023-04-22",2),
-        ("Design user interface",
+        1,"O", "T", "M", "2023-05-22",2),
+        ("BLOG-2", "Design user interface",
         "Develop a database with user specific information for blog",
-        1,"OPEN","2023-04-22",2);
+        1,"O", "T", "M", "2023-05-29",2);
         
 
 INSERT INTO `tags` (`name`)
