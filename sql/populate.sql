@@ -1,6 +1,21 @@
 use `issuetracker`;
 
 SET FOREIGN_KEY_CHECKS = 0;
+INSERT INTO `users` (`username`, `password`, `authorities`, `email`, `first_name`, `last_name`)
+VALUES
+        ("admin","$2a$10$dooeahdr86sqvX/Fkqi7wevRfNON4uyVPWowu4OTDvbPVSas/PWla",
+        "ROLE_ADMIN",
+        "test@mail.com",
+        "John", "Doe"),
+        ("user","$2a$10$1FY7wUp3KzJd5X4iBfMdu.Fq2MvbeSJdjb3iv/moTFxlWqRhxJ1DG",
+        "ROLE_ADMIN",
+        "test@mail.com",
+        "John", "Doe");
+        
+INSERT INTO `authorities` (`authority`, `user_id`)
+VALUES
+        ("ROLE_STUDENT",1);
+
 INSERT INTO `projects` (`project_key`, `name`,`description`,`start_date`, `issue_count`)
 VALUES
         ("BT","Bugtracker",

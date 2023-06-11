@@ -3,6 +3,35 @@ use `issuetracker`;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
+DROP TABLE IF EXISTS `users`;
+
+create table `users` 
+(
+`id` bigint not null auto_increment,
+`username` varchar(50) not null,
+`email` varchar(50),
+`password` char(68),
+`authorities` varchar(256),
+`enabled` tinyint(1) default 1,
+`first_name` varchar(50),
+`last_name` varchar(50),
+`company_name` varchar(50),
+PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `authorities`;
+
+create table `authorities` 
+(
+`id` bigint not null auto_increment,
+`authority` varchar(50) not null,
+`user_id` bigint,
+CONSTRAINT `FK_user_authorities` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+
+
+
 DROP TABLE IF EXISTS `projects`;
 
 create table `projects` 
@@ -24,7 +53,7 @@ create table `issues`
 (
 `id` bigint not null auto_increment,
 `issue_key` varchar(24),
-`name` varchar(50) not null,
+`name` varchar(68) not null,
 `description` varchar(256),
 `assignee` bigint,
 `status` char(1),

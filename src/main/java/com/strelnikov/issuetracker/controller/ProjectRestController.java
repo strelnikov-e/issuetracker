@@ -36,6 +36,8 @@ public class ProjectRestController {
 //        return projects;
 //    }
 
+
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     // Get all projects of current user
     @GetMapping("/projects")
     public CollectionModel<EntityModel<Project>> all(@RequestParam(value = "name", defaultValue = "", required = false) String name) {
