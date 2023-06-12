@@ -22,7 +22,7 @@ public class User {
 
     private String email;
 
-    @Column
+    @Column(columnDefinition = "char")
     private String password;
 
     private String authorities;
