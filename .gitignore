@@ -40,3 +40,7 @@ build/
 ## SQL temporary ##
 .sql
 /src/main/resources/certs/
+/client/node_modules/
+
+.DS_Store
+
