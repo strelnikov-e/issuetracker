@@ -1,0 +1,29 @@
+
+* {font-size: 14px;}
+
+
+.form-control:focus {
+    border-color: rgb(238, 128, 128);
+    box-shadow: 0 0 0 0rem rgba(172, 22, 104, 0.25);
+} 
+
+.form-control {
+  border-radius: 3px;
+  
+} 
+.form-control.is-valid:focus {
+  box-shadow: 0 0 0 2px rgba(40, 143, 59, 0.25);
+}
+.form-control.is-invalid:focus {
+  box-shadow: 0 0 0 2px rgba(172, 22, 104, 0.25);
+}
+
+.Badge-bug {
+  bagdge-font-weight: font-weight-normal;
+  color: #309ee7;
+  background-color: #e4e432;
+}
+
+.nav-dropdown-item {
+  color:rgba(40, 143, 59, 0.25)
+}
