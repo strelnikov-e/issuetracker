@@ -31,7 +31,8 @@ public class Issue {
 
 	private String description;
 
-	private Long assignee;
+	@Column(name="parent_issue")
+	private Long parentIssue;
 
 	@Column(columnDefinition = "char")
 	private IssueStatus status = IssueStatus.TODO;
@@ -62,13 +63,13 @@ public class Issue {
 	public Issue() {
 	}
 
-	public Issue(String name, Project project, String description, Long assignee,
+	public Issue(String name, Project project, String description, Long parentIssue,
 				 IssueStatus status, IssueType type, IssuePriority priority,
 				 LocalDate startDate, LocalDate dueDate, LocalDate closeDate, String key) {
 		this.name = name;
 		this.project = project;
 		this.description = description;
-		this.assignee = assignee;
+		this.parentIssue = parentIssue;
 		this.status = status;
 		this.type = type;
 		this.priority = priority;
@@ -120,7 +121,6 @@ public class Issue {
 				", name='" + name +
 				", project=" + project +
 				", description='" + description +
-				", assignee=" + assignee +
 				", status=" + status +
 				", type=" + type +
 				", priority=" + priority +
@@ -164,12 +164,12 @@ public class Issue {
 		this.description = description;
 	}
 
-	public Long getAssignee() {
-		return assignee;
+	public Long getParentIssue() {
+		return parentIssue;
 	}
 
-	public void setAssignee(Long assignee) {
-		this.assignee = assignee;
+	public void setParentIssue(Long parentIssue) {
+		this.parentIssue = parentIssue;
 	}
 
 	public IssueStatus getStatus() {

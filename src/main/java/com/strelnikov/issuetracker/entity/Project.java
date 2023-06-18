@@ -46,9 +46,6 @@ public class Project {
     @Column(name = "issue_count")
     private Integer issueCount = 0;
 
-//    @Column(name = "issue_status_list")
-//    private Set<IssueStatus> issueStatuses = Set.of(IssueStatus.TODO, IssueStatus.INPROGRESS, IssueStatus.INREVIEW, IssueStatus.DONE);;
-
     public Project() {
     }
 
@@ -61,14 +58,6 @@ public class Project {
         this.startDate = startDate;
         this.url = url;
         this.key = key;
-//        if (key != null) {
-//            System.out.println("key equals null");
-//            this.key = key;
-//        } else {
-//            System.out.println("key equals null");
-//            this.key = generateKey(name);
-//            System.out.println(key);
-//        }
     }
 
     public String generateKey(String name) {

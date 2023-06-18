@@ -1,6 +1,13 @@
 package com.strelnikov.issuetracker.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static jakarta.persistence.CascadeType.PERSIST;
+import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Table(name="users")
@@ -11,14 +18,14 @@ public class User {
     private Long id;
 
     private String username;
-//
-//    @OneToMany(fetch = LAZY, mappedBy = "user", cascade = PERSIST)
-//    @JsonIgnore
-//    private List<ProjectRole> projectRoles = new ArrayList<>();
-//
-//    @OneToMany(fetch = LAZY, mappedBy = "user", cascade = PERSIST)
-//    @JsonIgnore
-//    private List<IssueRole> issueRoles = new ArrayList<>();
+
+    @OneToMany(fetch = LAZY, mappedBy = "user", cascade = PERSIST)
+    @JsonIgnore
+    private List<ProjectRole> projectRoles = new ArrayList<>();
+
+    @OneToMany(fetch = LAZY, mappedBy = "user", cascade = PERSIST)
+    @JsonIgnore
+    private List<IssueRole> issueRoles = new ArrayList<>();
 
     private String email;
 
@@ -61,37 +68,37 @@ public class User {
     }
 
 
-//    public void addIssueRole(Issue issue, IssueRoleType issueRoleType) {
-//        final var issueRole = new IssueRole();
-//        issueRole.setIssue(issue);
-//        issueRole.setType(issueRoleType);
-//        issueRole.setUser(this);
-//        issueRoles.add(issueRole);
-//    }
-//
-//    public void addProjectRole(Project project, ProjectRoleType projectRoleType) {
-//        final var projectRole = new ProjectRole();
-//        projectRole.setProject(project);
-//        projectRole.setType(projectRoleType);
-//        projectRole.setUser(this);
-//        projectRoles.add(projectRole);
-//    }
+    public void addIssueRole(Issue issue, IssueRoleType issueRoleType) {
+        final var issueRole = new IssueRole(this, issue, issueRoleType);
+        issueRole.setIssue(issue);
+        issueRole.setType(issueRoleType);
+        issueRole.setUser(this);
+        issueRoles.add(issueRole);
+    }
 
-//    public List<ProjectRole> getProjectRoles() {
-//        return projectRoles;
-//    }
-//
-//    public void setProjectRoles(List<ProjectRole> projectRoles) {
-//        this.projectRoles = projectRoles;
-//    }
-//
-//    public List<IssueRole> getIssueRoles() {
-//        return issueRoles;
-//    }
-//
-//    public void setIssueRoles(List<IssueRole> issueRoles) {
-//        this.issueRoles = issueRoles;
-//    }
+    public void addProjectRole(Project project, ProjectRoleType projectRoleType) {
+        final var projectRole = new ProjectRole();
+        projectRole.setProject(project);
+        projectRole.setType(projectRoleType);
+        projectRole.setUser(this);
+        projectRoles.add(projectRole);
+    }
+
+    public List<ProjectRole> getProjectRoles() {
+        return projectRoles;
+    }
+
+    public void setProjectRoles(List<ProjectRole> projectRoles) {
+        this.projectRoles = projectRoles;
+    }
+
+    public List<IssueRole> getIssueRoles() {
+        return issueRoles;
+    }
+
+    public void setIssueRoles(List<IssueRole> issueRoles) {
+        this.issueRoles = issueRoles;
+    }
 
     public Long getId() {
         return id;

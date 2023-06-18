@@ -63,11 +63,50 @@ create table `issues`
 `due_date` date,
 `close_date` date,
 `project_id` bigint,
+`parent_issue` bigint default 0,
 PRIMARY KEY (`id`),
 CONSTRAINT `FK_issues_project_id` FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `tags`;
+
+DROP TABLE IF EXISTS `users_roles`;
+
+create table `users_roles` 
+(
+`id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+`user_id` BIGINT NOT NULL,
+`type` varchar(50) NOT NULL,
+UNIQUE KEY `UK_users_roles` (`user_id`,`type`),
+CONSTRAINT `FK_users_roles_id` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `projects_roles`;
+
+create table `projects_roles` 
+(
+`id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+`user_id` BIGINT NOT NULL,
+`project_id` bigint NOT NULL,
+`type` varchar(50) NOT NULL,
+UNIQUE KEY `UK_project_roles` (`user_id`,`project_id`,`type`),
+CONSTRAINT `FK_projects-roles_user_id` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`),
+CONSTRAINT `FK_projects-roles_proj_id` FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `issues_roles`;
+
+create table `issues_roles` 
+(
+`id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+`user_id` BIGINT NOT NULL,
+`issue_id` bigint NOT NULL,
+`type` varchar(50) NOT NULL,
+UNIQUE KEY `UK_issues_roles` (`user_id`,`issue_id`,`type`),
+CONSTRAINT `FK_issues_roles_user_id` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`),
+CONSTRAINT `FK_issues_roles_issue_id` FOREIGN KEY (`issue_id`) REFERENCES `issues`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 
 create table `tags` 
 (

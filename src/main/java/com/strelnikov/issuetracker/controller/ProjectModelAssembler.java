@@ -6,6 +6,8 @@ import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
@@ -14,7 +16,7 @@ public class ProjectModelAssembler implements RepresentationModelAssembler<Proje
     public EntityModel<Project> toModel(Project project) {
         return EntityModel.of(project,
                 WebMvcLinkBuilder.linkTo(methodOn(ProjectRestController.class).getById(project.getId())).withSelfRel(),
-                WebMvcLinkBuilder.linkTo(methodOn(ProjectRestController.class).all("")).withRel("projects"));
+                WebMvcLinkBuilder.linkTo(methodOn(ProjectRestController.class).all(new HashMap<>())).withRel("projects"));
 
     }
 }

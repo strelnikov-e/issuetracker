@@ -1,15 +1,16 @@
 package com.strelnikov.issuetracker.service;
 
+import com.strelnikov.issuetracker.config.RoleService;
 import com.strelnikov.issuetracker.entity.*;
+import com.strelnikov.issuetracker.exception.AccessForbiddenException;
 import com.strelnikov.issuetracker.exception.IssueNotFoundException;
 import com.strelnikov.issuetracker.exception.ProjectNotFoundException;
 import com.strelnikov.issuetracker.repository.IssueRepository;
+import com.strelnikov.issuetracker.repository.IssueRoleRepository;
 import com.strelnikov.issuetracker.repository.ProjectRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ReflectionUtils;
 
-import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -17,17 +18,57 @@ import java.util.Map;
 @Service
 public class IssueServiceImpl implements IssueService {
 
-	IssueRepository issueRepository;
-	ProjectRepository projectRepository;
+	private final IssueRepository issueRepository;
+	private final ProjectRepository projectRepository;
+	private final IssueRoleRepository issueRoleRepository;
+	private final RoleService roleService;
 
-	public IssueServiceImpl(IssueRepository issueRepository, ProjectRepository projectRepository) {
+	public IssueServiceImpl(
+			IssueRepository issueRepository,
+			ProjectRepository projectRepository,
+			IssueRoleRepository issueRoleRepository,
+			RoleService roleService
+	) {
 		this.issueRepository = issueRepository;
 		this.projectRepository = projectRepository;
+		this.issueRoleRepository = issueRoleRepository;
+		this.roleService = roleService;
 	}
 
 	@Override
 	public List<Issue> findAll() {
-		return issueRepository.findAll();
+		long userId = roleService.getCurrentUser().getId();
+		return issueRepository.findAllByUserId(userId);
+	}
+
+	@Override
+	public List<Issue> findByName(String name) {
+		if (name == null || name.equals("")) {
+			name = "";
+		}
+		long userId = roleService.getCurrentUser().getId();
+		return issueRepository.findByUserIdAndByNameContaining(userId, name);
+	}
+
+	@Override
+	public List<Issue> findByProjectId(Long projectId) {
+		if (!projectRepository.existsById(projectId)) {
+			throw new ProjectNotFoundException(projectId);
+		}
+		long userId = roleService.getCurrentUser().getId();
+		return issueRepository.findByUserIdAndByProjectId(userId, projectId);
+	}
+
+	@Override
+	public List<Issue> findByStatus(IssueStatus status) {
+		long userId = roleService.getCurrentUser().getId();
+		return issueRepository.findByUserIdAndByStatus(userId ,status);
+	}
+
+	@Override
+	public Issue findById(Long issueId) {
+		return issueRepository.findById(issueId)
+				.orElseThrow(() -> new IssueNotFoundException(issueId));
 	}
 
 	@Override
@@ -36,33 +77,10 @@ public class IssueServiceImpl implements IssueService {
 	}
 
 	@Override
-	public List<Issue> findByName(String name) {
-		if (name == null || name.equals("")) {
-			name = "";
-		}
-		return issueRepository.findByNameContaining(name);
-	}
-
-	@Override
-	public List<Issue> findByProjectId(Long projectId) {
-		if (!projectRepository.existsById(projectId)) {
-			throw new ProjectNotFoundException(projectId);
-		}
-		return issueRepository.findAllByProjectId(projectId);
-	}
-
-	@Override
-	public Issue findById(Long issueId) {
-		return issueRepository.findById(issueId).orElseThrow(() -> new IssueNotFoundException(issueId));
-	}
-
-	@Override
-	public List<Issue> findByStatus(IssueStatus status) {
-		return issueRepository.findByStatus(status);
-	}
-
-	@Override
+	@Transactional
 	public Issue create(Issue issue) {
+		Project project = projectRepository.findById(issue.getProject().getId())
+				.orElseThrow(() -> new ProjectNotFoundException(issue.getProject().getId()));
 		issue.setId(0L);
 		if (issue.getStatus() == null) {
 			issue.setStatus(IssueStatus.TODO);
@@ -73,26 +91,33 @@ public class IssueServiceImpl implements IssueService {
 		if (issue.getType() == null) {
 			issue.setType(IssueType.TASK);
 		}
-
-		Project project = projectRepository.findById(issue.getProject().getId())
-				.orElseThrow(() ->new ProjectNotFoundException(issue.getProject().getId()));
 		issue.setProject(project);
+
 		if (issue.getKey() == null || issue.getKey().isEmpty()) {
 			issue.generateKey(issue.getName());
 		}
-		return issueRepository.save(issue);
+		Issue savedIssue = issueRepository.save(issue);
+		roleService.getCurrentUser().addIssueRole(savedIssue, IssueRoleType.REPORTER);
+		return savedIssue;
 	}
 
 	@Override
 	public Issue update(Long issueId, Issue requestIssue) {
 		Issue issue = issueRepository.findById(issueId)
 				.orElseThrow(() -> new IssueNotFoundException(issueId));
-		issue.setTags(requestIssue.getTags());
-		issue.setAssignee(requestIssue.getAssignee());
+		if (!requestIssue.getName().isEmpty()) {
+			issue.setName(requestIssue.getName());
+		}
 		issue.setDescription(requestIssue.getDescription());
-		issue.setName(requestIssue.getName());
+		issue.setParentIssue(requestIssue.getParentIssue());
 		issue.setStatus(requestIssue.getStatus());
+		issue.setType(requestIssue.getType());
+		issue.setPriority(requestIssue.getPriority());
+		issue.setTags(requestIssue.getTags());
 		issue.setStartDate(requestIssue.getStartDate());
+		issue.setDueDate(requestIssue.getDueDate());
+		issue.setCloseDate(requestIssue.getCloseDate());
+
 		return issueRepository.save(issue);
 	}
 
@@ -100,17 +125,18 @@ public class IssueServiceImpl implements IssueService {
 	public Issue patch(Long issueId, Map<String, Object> fields) {
 		Issue issue = issueRepository.findById(issueId)
 				.orElseThrow(() -> new IssueNotFoundException(issueId));
-		fields.remove("id");
 		fields.forEach((k, v) -> {
-			Field field = ReflectionUtils.findField(Issue.class, k);
-			field.setAccessible(true);
 			switch (k) {
-				case "status" -> v = IssueStatus.valueOf(v.toString());
-				case "priority" -> v = IssuePriority.valueOf(v.toString());
-				case "type" -> v = IssueType.valueOf(v.toString());
-				case "closeDate" -> v = LocalDate.parse(v.toString());
+				case "name" -> issue.setName(v.toString());
+				case "description" -> issue.setDescription(v.toString());
+				case "parentIssue" -> issue.setParentIssue((Long) v);
+				case "status" -> issue.setStatus(IssueStatus.valueOf(v.toString()));
+				case "type" -> issue.setType(IssueType.valueOf(v.toString()));
+				case "priority" -> issue.setPriority(IssuePriority.valueOf(v.toString()));
+				case "startDate" ->  issue.setStartDate(LocalDate.parse(v.toString()));
+				case "dueDate" ->  issue.setDueDate(LocalDate.parse(v.toString()));
+				case "closeDate" ->  issue.setCloseDate(LocalDate.parse(v.toString()));
 			}
-			ReflectionUtils.setField(field, issue, v);
 		});
 		return issueRepository.save(issue);
 	}
@@ -118,9 +144,13 @@ public class IssueServiceImpl implements IssueService {
 	@Override
 	@Transactional
 	public void deleteById(Long issueId) {
-		if (!issueRepository.existsById(issueId)) {
-			throw new IssueNotFoundException(issueId);
-		}
+		Issue issue = issueRepository.findById(issueId)
+				.orElseThrow(() -> new IssueNotFoundException(issueId));
+		if (!roleService.hasAnyRoleByProjectId(issue.getProject().getId(), ProjectRoleType.MANAGER)) {
+			throw new AccessForbiddenException();
+		};
+
+		issueRoleRepository.deleteAllByIssueId(issueId);
 		issueRepository.deleteById(issueId);
 	}
 }

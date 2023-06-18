@@ -3,18 +3,34 @@ use `issuetracker`;
 SET FOREIGN_KEY_CHECKS = 0;
 INSERT INTO `users` (`username`, `password`, `authorities`, `email`, `first_name`, `last_name`)
 VALUES
-        ("admin","$2a$10$dooeahdr86sqvX/Fkqi7wevRfNON4uyVPWowu4OTDvbPVSas/PWla",
+        ("admin","{bcrypt}$2a$10$dooeahdr86sqvX/Fkqi7wevRfNON4uyVPWowu4OTDvbPVSas/PWla",
         "ROLE_ADMIN",
-        "test@mail.com",
+        "joe@mail.com",
         "John", "Doe"),
-        ("user","$2a$10$1FY7wUp3KzJd5X4iBfMdu.Fq2MvbeSJdjb3iv/moTFxlWqRhxJ1DG",
-        "ROLE_ADMIN",
-        "test@mail.com",
-        "John", "Doe");
+        ("user","{bcrypt}$2a$10$1FY7wUp3KzJd5X4iBfMdu.Fq2MvbeSJdjb3iv/moTFxlWqRhxJ1DG",
+        "ROLE_USER",
+        "jane@mail.com",
+        "Jane", "Doe");
         
 INSERT INTO `authorities` (`authority`, `user_id`)
 VALUES
         ("ROLE_STUDENT",1);
+        
+INSERT INTO `users_roles` (`user_id`, `type`)
+VALUES
+        (1 , 'ROOT');
+
+INSERT INTO `projects_roles` (`user_id`, `project_id`, `type`)
+VALUES
+        (1, 1, 'ADMIN'),
+        (1, 2, 'MANAGER'),
+        (2, 1, 'VIEWER');
+        
+INSERT INTO `issues_roles` (`user_id`, `issue_id`, `type`)
+VALUES
+        (2, 1, 'ASSIGNEE'),
+        (2, 2, 'REPORTER'),
+        (2, 3, 'VIEWER');
 
 INSERT INTO `projects` (`project_key`, `name`,`description`,`start_date`, `issue_count`)
 VALUES

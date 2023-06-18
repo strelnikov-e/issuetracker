@@ -16,4 +16,8 @@ public interface ProjectService {
     void deleteById(Long projectId);
 
     Project create(Project project);
+
+    List<Project> findAll();
+
+//    Collection<Project> findByManager(long parseLong);
 }
