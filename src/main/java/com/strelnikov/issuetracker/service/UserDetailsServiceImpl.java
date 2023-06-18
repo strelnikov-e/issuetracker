@@ -21,9 +21,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     // if user is found - map it to SecurityUser
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return userRepository
-                .findByUsername(username)
+                .findByEmail(email)
                 .map(SecurityUser::new)
                 .orElseThrow(() -> new UsernameNotFoundException("Invalid credentials"));
     }

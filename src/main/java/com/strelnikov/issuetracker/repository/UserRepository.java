@@ -10,13 +10,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends CrudRepository<User, Long> {
-    Optional<User> findByUsername(String username);
 
-    List<User> findByUsernameContaining(String username);
+    Optional<User> findByEmail(String email);
 
-    boolean existsByUsername(String username);
+    List<User> findByEmailContaining(String email);
 
-    void deleteByUsername(String username);
+    boolean existsByEmail(String email);
+
+    void deleteByEmail(String email);
 
     @Query("""
             SELECT user FROM User user

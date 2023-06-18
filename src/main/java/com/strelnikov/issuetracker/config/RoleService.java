@@ -76,14 +76,10 @@ public class RoleService {
         return false;
     }
 
-//    private static PlainAuthentication getCurrentAuthentication() {
-//        return (PlainAuthentication) SecurityContextHolder.getContext().getAuthentication();
-//    }
-
     public User getCurrentUser() {
         Jwt token  = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = token.getClaimAsString("sub");
-        return userRepository.findByUsername(username)
+        String email = token.getClaimAsString("sub");
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 

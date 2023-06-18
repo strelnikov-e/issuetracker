@@ -7,9 +7,7 @@ import com.strelnikov.issuetracker.entity.User;
 import com.strelnikov.issuetracker.exception.ProjectNotFoundException;
 import com.strelnikov.issuetracker.repository.ProjectRepository;
 import com.strelnikov.issuetracker.repository.ProjectRoleRepository;
-import com.strelnikov.issuetracker.repository.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,30 +20,29 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
     private final ProjectRoleRepository projectRoleRepository;
     private final IssueService issueService;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     public ProjectServiceImpl(
             ProjectRepository projectRepository,
             IssueService issueService,
-            UserRepository userRepository,
+            UserService userService,
             ProjectRoleRepository projectRoleRepository) {
 
         this.projectRepository = projectRepository;
         this.issueService = issueService;
-        this.userRepository = userRepository;
+        this.userService = userService;
         this.projectRoleRepository = projectRoleRepository;
     }
 
     private User getCurrentUser() {
         Jwt token  = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = token.getClaimAsString("sub");
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        String email = token.getClaimAsString("sub");
+        return userService.findByEmail(email);
     }
 
     @Override
     public List<Project> findAll() {
-        return projectRepository.findAllByUserId(getCurrentUser().getId());
+        return projectRepository.findAllByUserId(userService.getCurrentUser().getId());
     }
 
     @Override

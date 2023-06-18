@@ -97,20 +97,20 @@ public class UserRestController {
     Update user details.
     User details can be updated only by the user himself.
      */
-    @PutMapping("/users/{username}")
+    @PutMapping("/users/{id}")
 //    @PreAuthorize("@RoleService.hasAnyRoleByIssueId(#issueId, @IssueRole.ASSIGNEE)")
-    public  ResponseEntity<?> update(@PathVariable String username, @RequestBody User request) {
-        EntityModel<User> entityModel = assembler.toModel(userService.update(username,request));
+    public  ResponseEntity<?> update(@PathVariable Long id, @RequestBody User request) {
+        EntityModel<User> entityModel = assembler.toModel(userService.update(id,request));
         return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF)
                 .toUri())
                 .body(entityModel);
     }
 
     // to implement cascading delete of all user orphaned projects
-    @DeleteMapping("/users")
+    @DeleteMapping("/users/{id}")
     @PreAuthorize("@RoleService.hasRootRole()")
-    public ResponseEntity<?> delete(@RequestParam(value="username") String username) {
-        userService.deleteByUsername(username);
+    public ResponseEntity<?> delete(@RequestParam(value="id") Long id) {
+        userService.deleteById(id);
 
         return ResponseEntity.noContent().build();
     }

@@ -9,15 +9,19 @@ import java.util.List;
 
 public interface UserService {
 
-    UserDetails loadUserByUsername(String username) throws UserNotFoundException;
+    User getCurrentUser();
+
+    UserDetails loadUserByEmail(String email) throws UserNotFoundException;
 	
-	User findByUsername(String username);
+	User findByEmail(String email);
 
     List<User> findAll();
 
-    void deleteByUsername(String username);
+    void deleteByEmail(String email);
 
     User save(User user);
 
-    User update(String username, User user);
+    User update(Long id, User user);
+
+    void deleteById(Long id);
 }

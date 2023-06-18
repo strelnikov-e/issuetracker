@@ -1,15 +1,14 @@
 use `issuetracker`;
 
 SET FOREIGN_KEY_CHECKS = 0;
-INSERT INTO `users` (`username`, `password`, `authorities`, `email`, `first_name`, `last_name`)
+INSERT INTO `users` (`email`, `password`, `authorities`, `first_name`, `last_name`)
 VALUES
-        ("admin","{bcrypt}$2a$10$dooeahdr86sqvX/Fkqi7wevRfNON4uyVPWowu4OTDvbPVSas/PWla",
+        ("admin@mail.com",
+        "{bcrypt}$2a$10$dooeahdr86sqvX/Fkqi7wevRfNON4uyVPWowu4OTDvbPVSas/PWla",
         "ROLE_ADMIN",
-        "joe@mail.com",
         "John", "Doe"),
-        ("user","{bcrypt}$2a$10$1FY7wUp3KzJd5X4iBfMdu.Fq2MvbeSJdjb3iv/moTFxlWqRhxJ1DG",
+        ("viewer@mail.com","{bcrypt}$2a$10$1FY7wUp3KzJd5X4iBfMdu.Fq2MvbeSJdjb3iv/moTFxlWqRhxJ1DG",
         "ROLE_USER",
-        "jane@mail.com",
         "Jane", "Doe");
         
 INSERT INTO `authorities` (`authority`, `user_id`)

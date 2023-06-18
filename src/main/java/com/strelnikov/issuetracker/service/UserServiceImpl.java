@@ -1,7 +1,5 @@
 package com.strelnikov.issuetracker.service;
 
-//import com.strelnikov.issuetracker.config.PlainAuthentication;
-
 import com.strelnikov.issuetracker.entity.ProjectRole;
 import com.strelnikov.issuetracker.entity.ProjectRoleType;
 import com.strelnikov.issuetracker.entity.User;
@@ -12,6 +10,7 @@ import com.strelnikov.issuetracker.repository.UserRoleRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,25 +23,22 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
 	
-	private UserRepository userRepository;
-	private UserRoleRepository userRoleRepository;
+	private final UserRepository userRepository;
+	private final UserRoleRepository userRoleRepository;
+	private final PasswordEncoder passwordEncoder;
 	
-	public UserServiceImpl(UserRepository userRepository, UserRoleRepository userRoleRepository) {
+	public UserServiceImpl(UserRepository userRepository, UserRoleRepository userRoleRepository, PasswordEncoder passwordEncoder) {
 		this.userRepository = userRepository;
 		this.userRoleRepository = userRoleRepository;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	public User getCurrentUser() {
 		Jwt token  = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String username = token.getClaimAsString("sub");
-		return userRepository.findByUsername(username)
+		String email = token.getClaimAsString("sub");
+		return userRepository.findByEmail(email)
 				.orElseThrow(() -> new UsernameNotFoundException("User not found"));
 	}
-
-//	private User getCurrentUser() {
-//		final var userId = ((PlainAuthentication) SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
-//		return userRepository.findById(userId).orElseThrow();
-//	}
 
 	@Override
 	public List<User> findAll() {
@@ -62,35 +58,32 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UserNotFoundException {
+	public UserDetails loadUserByEmail(String email) throws UserNotFoundException {
 		return null;
 	}
 
 	@Override
-	public User findByUsername(String username) {
-		return null;
+	public User findByEmail(String email) {
+		User user = userRepository.findByEmail(email)
+				.orElseThrow(() -> new UserNotFoundException(email));
+		return user;
 	}
 
-	//	@Override
-//	public User findByEmail(String email) {
-//		User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
-//		return user;
-//	}
-
-
 	@Override
-	public User save(User user) {
-		if (userRepository.existsByUsername(user.getUsername())) {
-			throw new UserAlreadyExistsException(user.getUsername());
+	public User save(User requestUser) {
+		if (userRepository.existsByEmail(requestUser.getEmail())) {
+			throw new UserAlreadyExistsException(requestUser.getEmail());
 		}
-		return userRepository.save(user);
+		final String encodedPwd = "{bcrypt}" + passwordEncoder.encode(requestUser.getPassword());
+		requestUser.setPassword(encodedPwd);
+		System.out.println(requestUser.getPassword());
+		return userRepository.save(requestUser);
 	}
 
 	@Override
-	public User update(String username, User requestUser) {
-		User user = userRepository.findByUsername(username)
-				.orElseThrow(() -> new UserNotFoundException(username));
-
+	public User update(Long id, User requestUser) {
+		User user = userRepository.findById(id)
+				.orElseThrow(() -> new UserNotFoundException(id.toString()));
 //		if (!Objects.equals(user.getId(), getCurrentUser().getId())) {
 //			throw new AccessForbiddenException();
 //		}
@@ -101,14 +94,20 @@ public class UserServiceImpl implements UserService {
 		return userRepository.save(user);
 	}
 
+	// to implement
+	@Override
+	public void deleteById(Long userId) {
+		userRoleRepository.deleteAllByUserId(userId);
+		userRepository.deleteById(userId);
+	}
+
 	@Override
 	@Transactional
-	public void deleteByUsername(String username) {
-		Long userId = userRepository.findByUsername(username)
-				.orElseThrow(() -> new UserNotFoundException(username))
+	public void deleteByEmail(String email) {
+		Long userId = userRepository.findByEmail(email)
+				.orElseThrow(() -> new UserNotFoundException(email))
 				.getId();
-
 		userRoleRepository.deleteAllByUserId(userId);
-		userRepository.deleteByUsername(username);
+		userRepository.deleteByEmail(email);
 	}
 }

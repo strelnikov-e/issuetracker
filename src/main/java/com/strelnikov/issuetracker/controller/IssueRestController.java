@@ -22,7 +22,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api")
-//@CrossOrigin("http://localhost:3000")
 public class IssueRestController {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProjectRestController.class);

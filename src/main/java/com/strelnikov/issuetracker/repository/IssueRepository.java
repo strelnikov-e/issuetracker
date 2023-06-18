@@ -5,23 +5,9 @@ import com.strelnikov.issuetracker.entity.IssueStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface IssueRepository extends JpaRepository<Issue, Long> {
-	
-	List<Issue> findAllByProjectId(Long projectId);
-
-    List<Issue> findIssuesByTagsId(Long tagId);
-
-    List<Issue> findAllByProjectIdAndNameContaining(Long projectId, String name);
-
-    Collection<Issue> findByProjectIdAndNameContaining(Long projectId, String name);
-
-
-    List<Issue> findByNameContaining(String name);
-
-    List<Issue> findByStatus(IssueStatus status);
 
     @Query("""
             SELECT issue from Issue issue

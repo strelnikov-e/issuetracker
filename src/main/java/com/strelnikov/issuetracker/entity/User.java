@@ -17,7 +17,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
+    private String email;
 
     @OneToMany(fetch = LAZY, mappedBy = "user", cascade = PERSIST)
     @JsonIgnore
@@ -27,7 +27,6 @@ public class User {
     @JsonIgnore
     private List<IssueRole> issueRoles = new ArrayList<>();
 
-    private String email;
 
     @Column(columnDefinition = "char")
     private String password;
@@ -50,15 +49,14 @@ public class User {
 
     }
 
-    public User(String username, String password, String authorities) {
-        this.username = username;
+    public User(String email, String password, String authorities) {
+        this.email = email;
         this.password = password;
         this.authorities = authorities;
     }
 
-    public User(String username, String email, String password, boolean enabled,
+    public User(String email, String password, boolean enabled,
                 String firstName, String lastName, String companyName) {
-        this.username = username;
         this.email = email;
         this.password = password;
         this.enabled = true;
@@ -106,15 +104,6 @@ public class User {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getEmail() {
@@ -178,7 +167,6 @@ public class User {
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", authorities='" + authorities + '\'' +

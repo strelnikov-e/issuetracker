@@ -18,6 +18,4 @@ public interface ProjectService {
     Project create(Project project);
 
     List<Project> findAll();
-
-//    Collection<Project> findByManager(long parseLong);
 }

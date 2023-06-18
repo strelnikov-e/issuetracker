@@ -21,23 +21,26 @@ public class IssueServiceImpl implements IssueService {
 	private final IssueRepository issueRepository;
 	private final ProjectRepository projectRepository;
 	private final IssueRoleRepository issueRoleRepository;
+	private final UserService userService;
 	private final RoleService roleService;
 
 	public IssueServiceImpl(
 			IssueRepository issueRepository,
 			ProjectRepository projectRepository,
 			IssueRoleRepository issueRoleRepository,
-			RoleService roleService
-	) {
+			UserService userService,
+			RoleService roleService) {
+
 		this.issueRepository = issueRepository;
 		this.projectRepository = projectRepository;
 		this.issueRoleRepository = issueRoleRepository;
+		this.userService = userService;
 		this.roleService = roleService;
 	}
 
 	@Override
 	public List<Issue> findAll() {
-		long userId = roleService.getCurrentUser().getId();
+		long userId = userService.getCurrentUser().getId();
 		return issueRepository.findAllByUserId(userId);
 	}
 
@@ -46,7 +49,7 @@ public class IssueServiceImpl implements IssueService {
 		if (name == null || name.equals("")) {
 			name = "";
 		}
-		long userId = roleService.getCurrentUser().getId();
+		long userId = userService.getCurrentUser().getId();
 		return issueRepository.findByUserIdAndByNameContaining(userId, name);
 	}
 
@@ -55,13 +58,13 @@ public class IssueServiceImpl implements IssueService {
 		if (!projectRepository.existsById(projectId)) {
 			throw new ProjectNotFoundException(projectId);
 		}
-		long userId = roleService.getCurrentUser().getId();
+		long userId = userService.getCurrentUser().getId();
 		return issueRepository.findByUserIdAndByProjectId(userId, projectId);
 	}
 
 	@Override
 	public List<Issue> findByStatus(IssueStatus status) {
-		long userId = roleService.getCurrentUser().getId();
+		long userId = userService.getCurrentUser().getId();
 		return issueRepository.findByUserIdAndByStatus(userId ,status);
 	}
 
@@ -97,7 +100,7 @@ public class IssueServiceImpl implements IssueService {
 			issue.generateKey(issue.getName());
 		}
 		Issue savedIssue = issueRepository.save(issue);
-		roleService.getCurrentUser().addIssueRole(savedIssue, IssueRoleType.REPORTER);
+		userService.getCurrentUser().addIssueRole(savedIssue, IssueRoleType.REPORTER);
 		return savedIssue;
 	}
 
