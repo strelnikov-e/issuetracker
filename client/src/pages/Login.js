@@ -19,17 +19,17 @@ const Login = () => {
   // to set focus on error
   const errRef = useRef();
 
-  const [username, setUsername] = useState("");
+  const [email, setemail] = useState("");
   const [password, setPassword] = useState("");
   const [errMsg, setErrMsg] = useState("");
 
   // clear error on user input
   useEffect(() => {
     setErrMsg("");
-  }, [username, password]);
+  }, [email, password]);
 
   function validateForm() {
-    return username.length > 0 && password.length > 0;
+    return email.length > 0 && password.length > 0;
   }
 
   const handleSubmit = async (event) => {
@@ -38,7 +38,7 @@ const Login = () => {
     try {
       const response = await axios.post(
         "http://localhost:8080/api/token",
-        { username, password },
+        { email, password },
         {
           headers: { "Content-Type": "application/json" },
         }
@@ -47,13 +47,13 @@ const Login = () => {
       const accessToken = response?.data;
       // implement roles
       const roles = null;
-      setAuth({ username, password, accessToken });
+      setAuth({ email, password, accessToken });
       setAuthToken(accessToken);
-      localStorage.setItem("username", username);
+      localStorage.setItem("email", email);
       localStorage.setItem("password", password);
       localStorage.setItem("accessToken", accessToken);
 
-      setUsername("");
+      setemail("");
       setPassword("");
 
       navigate(from, { replace: true });
@@ -61,9 +61,9 @@ const Login = () => {
       if (!err?.response) {
         setErrMsg("No response from server");
       } else if (err.response?.status === 400) {
-        setErrMsg("Missing Username or Password");
+        setErrMsg("Missing email or Password");
       } else if (err.response?.status === 401) {
-        setErrMsg("Wrong username or password");
+        setErrMsg("Wrong email or password");
       } else {
         setErrMsg("Login failed");
       }
@@ -96,16 +96,16 @@ const Login = () => {
         <Card.Body className="p-0">
           <hr></hr>
           <Form onSubmit={handleSubmit} className="d-grid mb-5">
-            <Form.Group size="lg" className="mb-3" controlId="username">
+            <Form.Group size="lg" className="mb-3" controlId="email">
               <Form.Label className="text-muted fw-semibold">
-                Username
+                Email
               </Form.Label>
               <Form.Control
                 autoFocus
                 type="text"
-                value={username}
+                value={email}
                 autoComplete="off"
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => setemail(e.target.value)}
                 required
               />
             </Form.Group>

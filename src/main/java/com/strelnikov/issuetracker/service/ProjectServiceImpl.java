@@ -63,8 +63,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     public Project create(Project project) {
         project.setId(0L);
-        if (project.getKey() == null || project.getKey().isEmpty()) {
-            System.out.println("ket is null " + project.getKey());
+        System.out.println(project);
+        if (project.getKey() == null || project.getKey().isEmpty() || project.getKey().equals("null")) {
+            System.out.println("key is null " + project.getKey());
             project.setKey(project.generateKey(project.getName()));
         }
         Project savedProject = projectRepository.save(project);

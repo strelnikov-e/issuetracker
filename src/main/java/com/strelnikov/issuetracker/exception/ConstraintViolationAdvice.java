@@ -36,4 +36,11 @@ public class ConstraintViolationAdvice {
         return errors;
     }
 
+    @ResponseBody
+    @ExceptionHandler(CannotProcessRequest.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    String CannotProcessRequest(CannotProcessRequest e) {
+        return e.getMessage();
+    }
+
 }

@@ -44,12 +44,12 @@ function App() {
     ket: "BT",
   });
   const { auth, setAuth } = useAuth({
-    username: localStorage.getItem("username"),
+    email: localStorage.getItem("email"),
     accessToken: localStorage.getItem("accessToken"),
   });
 
   console.log("App project: ", project);
-  console.log("Local storage ", localStorage.getItem("username"));
+  console.log("Local storage ", localStorage.getItem("email"));
 
   //check jwt token
   const token = localStorage.getItem("accessToken");

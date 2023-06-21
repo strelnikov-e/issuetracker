@@ -1,5 +1,3 @@
-use `issuetracker`;
-
 SET FOREIGN_KEY_CHECKS = 0;
 INSERT INTO `users` (`email`, `password`, `first_name`, `last_name`)
 VALUES
@@ -11,7 +9,7 @@ VALUES
         "Richard", "Hendricks"),
         ("viewer@mail.com","{bcrypt}$2a$10$1FY7wUp3KzJd5X4iBfMdu.Fq2MvbeSJdjb3iv/moTFxlWqRhxJ1DG",
         "Jared", "Dunn");
-        
+
 INSERT INTO `users_roles` (`user_id`, `type`)
 VALUES
         (1 , 'ROOT');
@@ -21,11 +19,9 @@ VALUES
         (2, 1, 'ADMIN'),
         (2, 2, 'MANAGER'),
         (3, 1, 'VIEWER');
-        
+
 INSERT INTO `issues_roles` (`user_id`, `issue_id`, `type`)
 VALUES
-        (3, 1, 'ASSIGNEE'),
-        (3, 2, 'REPORTER'),
         (3, 3, 'VIEWER');
 
 INSERT INTO `projects` (`project_key`, `name`,`description`,`start_date`, `issue_count`)
@@ -36,7 +32,7 @@ VALUES
         ("BLOG","Blog",
         "Dragt project for testing",
         "2023-04-22", 2);
-        
+
 INSERT INTO `issues` (`issue_key`, `name`,`description`,`status`, `type`, `priority`, `start_date`,`project_id`)
 VALUES
         ("BT-1", "Create issues database",
@@ -57,7 +53,7 @@ VALUES
         ("BLOG-2", "Design user interface",
         "Develop a database with user specific information for blog",
         "O", "T", "M", "2023-05-29",2);
-        
+
 
 INSERT INTO `tags` (`name`)
 VALUES

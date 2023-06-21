@@ -108,7 +108,7 @@ public class IssueServiceImpl implements IssueService {
 	public Issue update(Long issueId, Issue requestIssue) {
 		Issue issue = issueRepository.findById(issueId)
 				.orElseThrow(() -> new IssueNotFoundException(issueId));
-		if (!requestIssue.getName().isEmpty()) {
+		if (requestIssue.getName() != null && !requestIssue.getName().isEmpty()) {
 			issue.setName(requestIssue.getName());
 		}
 		issue.setDescription(requestIssue.getDescription());

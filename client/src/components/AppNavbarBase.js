@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { NavLink } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import useAuth from "../utils/hooks/useAuth";
 import { setAuthToken } from "../utils/SetGlobalAuthToken";
+import { ProjectContext } from "../App";
 import AppNavbar from "./AppNavbar";
 
 function AppNavbarBase() {
   const { auth, setAuth } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [isAuth, setIsAuth] = useState(auth?.username ? true : false);
+  const [isAuth, setIsAuth] = useState(auth?.email ? true : false);
+  const { currentProject, setCurrentProject } = useContext(ProjectContext);
 
   const toggle = () => setIsOpen(!isOpen);
 
@@ -18,12 +20,13 @@ function AppNavbarBase() {
     setAuth({});
     setAuthToken({});
     localStorage.setItem("accessToken", "");
-    localStorage.setItem("username", "");
+    localStorage.setItem("email", "");
     localStorage.setItem("password", "");
+    setCurrentProject(null)
   };
 
   useEffect(() => {
-    setIsAuth(auth?.username ? true : false);
+    setIsAuth(auth?.email ? true : false);
   }, [auth]);
 
   return (

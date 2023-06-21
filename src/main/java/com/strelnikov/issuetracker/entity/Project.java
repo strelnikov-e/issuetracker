@@ -33,9 +33,6 @@ public class Project {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "manager")
-    private Long manager;
-
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     @Column(name="start_date")
     private LocalDate startDate;
@@ -50,11 +47,10 @@ public class Project {
     }
 
     public Project(String name, String key, List<Issue> issues, String description,
-                   Long manager, LocalDate startDate, String url) {
+                   LocalDate startDate, String url) {
         this.name = name;
         this.issues = issues;
         this.description = description;
-        this.manager = manager;
         this.startDate = startDate;
         this.url = url;
         this.key = key;
@@ -88,7 +84,6 @@ public class Project {
                 ", key='" + key + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", manager=" + manager +
                 ", startDate=" + startDate +
                 ", url='" + url + '\'' +
                 '}';
@@ -140,14 +135,6 @@ public class Project {
 
     public void setKey(String key) {
         this.key = key;
-    }
-
-    public Long getManager() {
-        return manager;
-    }
-
-    public void setManager(Long manager) {
-        this.manager = manager;
     }
 
     public String getUrl() {

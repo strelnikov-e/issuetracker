@@ -18,18 +18,18 @@ public class Issue {
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(name = "issue_key")
+	private String key;
+
 	@NotNull()
 	@NotBlank(message = "name field cannot be empty")
 	private String name;
 
-	@Column(name = "issue_key")
-	private String key;
+	private String description;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "project_id")
 	private Project project;
-
-	private String description;
 
 	@Column(name="parent_issue")
 	private Long parentIssue;

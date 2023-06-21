@@ -11,6 +11,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -50,6 +51,7 @@ public class TagRestController {
     }
 
     @GetMapping("/issues/{issueId}/tags")
+    @PreAuthorize("@RoleService.hasAnyRoleByIssueId(#issueId, @IssueRole.VIEWER)")
     public CollectionModel<EntityModel<Tag>> getTagsByIssueId(@PathVariable Long issueId) {
         Issue issue = issueService.findById(issueId);
         if (issue == null) {
@@ -62,6 +64,7 @@ public class TagRestController {
     }
 
     @PostMapping("/issues/{issueId}/tags")
+    @PreAuthorize("@RoleService.hasAnyRoleByIssueId(#issueId, @IssueRole.ASSIGNEE)")
     public ResponseEntity<?> addTag(@PathVariable Long issueId, @RequestBody Tag tagRequest) {
         EntityModel<Tag> entityModel = assembler.toModel(tagService.addTag(issueId, tagRequest));
 
@@ -69,6 +72,7 @@ public class TagRestController {
     }
 
     @DeleteMapping("/issues/{issueId}/tags/{tagId}")
+    @PreAuthorize("@RoleService.hasAnyRoleByIssueId(#issueId, @IssueRole.ASSIGNEE)")
     public ResponseEntity<?> deleteTagFromIssue(@PathVariable Long tagId, @PathVariable Long issueId) {
         Issue issue = issueService.findById(issueId);
         Tag tag = tagService.findById(tagId);

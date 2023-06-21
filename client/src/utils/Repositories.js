@@ -3,8 +3,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import useAuth from "./hooks/useAuth";
 
 export function FetchIssues(key, url) {
+  const { auth } = useAuth();
   const { isLoading, error, data } = useQuery({
-    queryKey: [key],
+    queryKey: [auth.email + key],
     queryFn: () =>
       axios.get(url).then((response) => {
         const result = processData(response.data);
@@ -19,8 +20,9 @@ export const FetchProjects = () => {
   // if (auth?.username ? true : false) {
   //   return {data: {}, isLoading: false, error: {}}
   // }
+  console.log("Fetch Projects: ", auth.email)
   const { isLoading, error, data } = useQuery({
-    queryKey: ["projects"],
+    queryKey: [auth.email + "projects"],
     queryFn: async () => {
       const response = 
         await axios.get("/api/projects")

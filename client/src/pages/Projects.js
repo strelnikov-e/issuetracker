@@ -62,7 +62,7 @@ export default function Projects() {
     return <p>Loading...</p>;
   }
 
-  const projectList = data._embedded.projectList.map((project) => {
+  const projectList = data._embedded?.projectList?.map((project) => {
     const id = project.id;
     const name = project.name;
     console.log(id, name)

@@ -7,7 +7,6 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
@@ -42,41 +41,18 @@ public class UserRestController {
             users = userService.findAll().stream()
                     .map(assembler::toModel)
                     .collect(Collectors.toSet());
-            ;
         }
-//        else {
-//            for (var param: params.entrySet()) {
-//                switch (param.getKey()) {
-//                    case "name" -> issues = issueService.findByName(param.getValue().toString())
-//                            .stream()
-//                            .map(assembler::toModel)
-//                            .collect(Collectors.toList());
-//                    case "projectId" -> issues = issueService.findByProjectId(Long.parseLong(param.getValue().toString()))
-//                            .stream()
-//                            .map(assembler::toModel)
-//                            .collect(Collectors.toList());
-//                    case "status" -> issues = issueService.findByStatus(IssueStatus.valueOf(param.getValue().toString()))
-//                            .stream()
-//                            .map(assembler::toModel)
-//                            .collect(Collectors.toList());
-//                }
-//            }
 
         return CollectionModel
                 .of(users, linkTo(methodOn(UserRestController.class)
                         .all(params)).withSelfRel());
     }
 
-//        List<EntityModel<User>> users = userService.findAll(username).stream()
-//                .map(assembler::toModel)
-//                .collect(Collectors.toList());
-//
-//        return CollectionModel.of(
-//                users,
-//                linkTo(methodOn(UserRestController.class)
-//                        .all(username))
-//                        .withSelfRel());
-//    }
+    @GetMapping("/users/details")
+    public EntityModel<?> userDetails() {
+        User user = userService.getCurrentUser();
+        return assembler.toModel(user);
+    }
 
     /*
     Register new user.
@@ -98,7 +74,6 @@ public class UserRestController {
     User details can be updated only by the user himself.
      */
     @PutMapping("/users/{id}")
-//    @PreAuthorize("@RoleService.hasAnyRoleByIssueId(#issueId, @IssueRole.ASSIGNEE)")
     public  ResponseEntity<?> update(@PathVariable Long id, @RequestBody User request) {
         EntityModel<User> entityModel = assembler.toModel(userService.update(id,request));
         return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF)
@@ -106,12 +81,9 @@ public class UserRestController {
                 .body(entityModel);
     }
 
-    // to implement cascading delete of all user orphaned projects
-    @DeleteMapping("/users/{id}")
-    @PreAuthorize("@RoleService.hasRootRole()")
-    public ResponseEntity<?> delete(@RequestParam(value="id") Long id) {
-        userService.deleteById(id);
-
+    @DeleteMapping("/users/delete")
+    public ResponseEntity<?> delete() {
+        userService.delete();
         return ResponseEntity.noContent().build();
     }
 }

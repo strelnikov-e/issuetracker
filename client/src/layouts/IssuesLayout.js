@@ -15,7 +15,7 @@ export default function IssuesLayout() {
     return (
         <div>
             <div className="container-lg">
-                <h4 className="mb-3">{currentProject.name}</h4>
+                <h4 className="mb-3">{currentProject?.name && "Project"}</h4>
 
                 <div className="d-grid gap-2 d-md-block">
                     <form className="row align-items-center mb-5">

@@ -17,11 +17,11 @@ public interface UserService {
 
     List<User> findAll();
 
-    void deleteByEmail(String email);
-
     User save(User user);
 
     User update(Long id, User user);
 
-    void deleteById(Long id);
+    void delete();
+
+    User getUserDetails();
 }

@@ -110,24 +110,6 @@ export default function Login() {
     }
   };
 
-  // async function handleSubmit(event) {
-  //   event.preventDefault();
-  //   console.log(username)
-  //   console.log(pwd)
-  //   const response = await fetch('http://localhost:8080/api/token', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json'
-  //     },
-  //     body: JSON.stringify({ username, pwd })
-  //   });
-  //   if (response.status === 200) {
-  //     const token = await response.text();
-  //     this.user = username;
-  //     this.token = token;
-  //   }
-  // }
-
   return (
     <div className="row d-flex justify-content-center align-items-center h-100">
       <Card border="0" style={{ width: "600px" }} className="">

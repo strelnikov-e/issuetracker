@@ -26,7 +26,7 @@ export const issueLoader = async () => {
 export default function Issues() {
   
   const { currentProject } = useContext(ProjectContext);
-  const url = `/api/issues?projectId=${currentProject.id}`;
+  const url = `/api/issues?projectId=${currentProject?.id && "1"}`;
   const { data, isLoading, error } = FetchIssues(url ,url);
   const queryClient = useQueryClient();
   console.log("data in issues" ,data)

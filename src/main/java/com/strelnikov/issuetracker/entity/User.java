@@ -31,8 +31,6 @@ public class User {
     @Column(columnDefinition = "char")
     private String password;
 
-    private String authorities;
-
     private boolean enabled = true;
 
     @Column(name="first_name")
@@ -49,10 +47,9 @@ public class User {
 
     }
 
-    public User(String email, String password, String authorities) {
+    public User(String email, String password) {
         this.email = email;
         this.password = password;
-        this.authorities = authorities;
     }
 
     public User(String email, String password, boolean enabled,
@@ -123,14 +120,6 @@ public class User {
         this.password = password;
     }
 
-    public String getAuthorities() {
-        return authorities;
-    }
-
-    public void setAuthorities(String authorities) {
-        this.authorities = authorities;
-    }
-
     public boolean isEnabled() {
         return enabled;
     }
@@ -169,7 +158,6 @@ public class User {
                 "id=" + id +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
-                ", authorities='" + authorities + '\'' +
                 ", enabled=" + enabled +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +

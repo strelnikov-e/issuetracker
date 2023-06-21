@@ -8,28 +8,15 @@ DROP TABLE IF EXISTS `users`;
 create table `users` 
 (
 `id` bigint not null auto_increment,
-`username` varchar(50) not null,
-`email` varchar(50),
-`password` char(68),
-`authorities` varchar(256),
+`email` varchar(50) not null unique,
+`password` char(68) not null,
 `enabled` tinyint(1) default 1,
-`first_name` varchar(50),
-`last_name` varchar(50),
+`first_name` varchar(50) not null,
+`last_name` varchar(50) not null,
 `company_name` varchar(50),
 PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
-
-DROP TABLE IF EXISTS `authorities`;
-
-create table `authorities` 
-(
-`id` bigint not null auto_increment,
-`authority` varchar(50) not null,
-`user_id` bigint,
-CONSTRAINT `FK_user_authorities` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
-
+) 
+ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `projects`;
@@ -38,37 +25,35 @@ create table `projects`
 (
 `id` bigint not null auto_increment,
 `name` varchar(50) not null,
-`project_key` varchar(16),
+`project_key` varchar(16) not null,
 `description` text,
-`manager` bigint,
 `start_date` date,
 `url` varchar(256),
 `issue_count` int,
 PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+) 
+ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `issues`;
 
 create table `issues` 
 (
 `id` bigint not null auto_increment,
-`issue_key` varchar(24),
-`name` varchar(68) not null,
-`description` varchar(256),
-`assignee` bigint,
-`status` char(1),
-`type` char(1),
-`priority` char(1),
+`issue_key` varchar(24) not null,
+`name` varchar(128) not null,
+`description` text,
+`project_id` bigint,
+`parent_issue` bigint default 0,
+`status` char(1) default 'O' not null,
+`type` char(1) default 'T' not null,
+`priority` char(1) default 'M' not null,
 `start_date` date,
 `due_date` date,
 `close_date` date,
-`project_id` bigint,
-`parent_issue` bigint default 0,
 PRIMARY KEY (`id`),
 CONSTRAINT `FK_issues_project_id` FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
-
-DROP TABLE IF EXISTS `tags`;
+) 
+ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `users_roles`;
 
@@ -79,7 +64,8 @@ create table `users_roles`
 `type` varchar(50) NOT NULL,
 UNIQUE KEY `UK_users_roles` (`user_id`,`type`),
 CONSTRAINT `FK_users_roles_id` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) 
+ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `projects_roles`;
 
@@ -92,7 +78,8 @@ create table `projects_roles`
 UNIQUE KEY `UK_project_roles` (`user_id`,`project_id`,`type`),
 CONSTRAINT `FK_projects-roles_user_id` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`),
 CONSTRAINT `FK_projects-roles_proj_id` FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) 
+ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `issues_roles`;
 
@@ -105,15 +92,18 @@ create table `issues_roles`
 UNIQUE KEY `UK_issues_roles` (`user_id`,`issue_id`,`type`),
 CONSTRAINT `FK_issues_roles_user_id` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`),
 CONSTRAINT `FK_issues_roles_issue_id` FOREIGN KEY (`issue_id`) REFERENCES `issues`(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) 
+ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+DROP TABLE IF EXISTS `tags`;
 
 create table `tags` 
 (
 `id` bigint NOT NULL auto_increment,
 `name` varchar(50) NOT NULL UNIQUE,
 primary key (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) 
+ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `issues_tags`;

@@ -12,7 +12,7 @@ export default function Boards() {
   const { state } = useLocation();
   const { currentProject } = useContext(ProjectContext);
 
-  const url = `/api/issues?projectId=${currentProject.id}`;
+  const url = `/api/issues?projectId=${currentProject?.id}`;
 
   const { data, isLoading, error } = FetchIssues(url ,url);
   const queryClient = useQueryClient();
@@ -108,7 +108,7 @@ export default function Boards() {
 
   if (isLoading) return <p>'Loading...'</p>;
 
-  if (error || update.isError) return "An error has occured: " + error.message;
+  if (error || update.isError) return "An error has occured: " + error?.message;
 
 
   return (

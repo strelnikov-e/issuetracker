@@ -61,7 +61,7 @@ public class ProjectRestController {
         }
         return CollectionModel
                 .of(projects, linkTo(methodOn(ProjectRestController.class)
-                .all(params)).withSelfRel());
+                        .all(params)).withSelfRel());
     }
 
     /*
@@ -124,3 +124,6 @@ public class ProjectRestController {
 //    }
 
 }
+
+
+

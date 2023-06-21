@@ -1,8 +1,9 @@
 package com.strelnikov.issuetracker.service;
 
-import com.strelnikov.issuetracker.entity.ProjectRole;
+import com.strelnikov.issuetracker.entity.IssueRoleType;
 import com.strelnikov.issuetracker.entity.ProjectRoleType;
 import com.strelnikov.issuetracker.entity.User;
+import com.strelnikov.issuetracker.exception.CannotProcessRequest;
 import com.strelnikov.issuetracker.exception.UserAlreadyExistsException;
 import com.strelnikov.issuetracker.exception.UserNotFoundException;
 import com.strelnikov.issuetracker.repository.UserRepository;
@@ -40,19 +41,17 @@ public class UserServiceImpl implements UserService {
 				.orElseThrow(() -> new UsernameNotFoundException("User not found"));
 	}
 
+	/*
+    Returns list of users assigned to the projects, where current user is MANAGER or ADMIN
+     */
 	@Override
 	public List<User> findAll() {
-		User user = getCurrentUser();
-		// find all project IDs where user is ADMIN or MANAGER
-		List<ProjectRole> projects = user.getProjectRoles();
-		Set<Long> projectIds = projects.stream()
-				.filter(role -> role.getType() != ProjectRoleType.VIEWER)
-				.map(role -> role.getProject().getId())
-				.collect(Collectors.toSet());
+		User user = userRepository.findById(getCurrentUser().getId())
+				.orElseThrow(UserNotFoundException::new);
+		Set<Long> projectIds = getProjectIdsOfUser(user);
 		Set<User> users = new HashSet<>();
-		// add to list users with role VIEWER
 		for (Long id : projectIds) {
-			users.addAll(userRepository.findViewersByProjectId(id, ProjectRoleType.VIEWER));
+			users.addAll(userRepository.findByProjectId(id));
 		}
 		return users.stream().toList();
 	}
@@ -65,7 +64,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User findByEmail(String email) {
 		User user = userRepository.findByEmail(email)
-				.orElseThrow(() -> new UserNotFoundException(email));
+				.orElseThrow(() -> new UserNotFoundException());
 		return user;
 	}
 
@@ -83,7 +82,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User update(Long id, User requestUser) {
 		User user = userRepository.findById(id)
-				.orElseThrow(() -> new UserNotFoundException(id.toString()));
+				.orElseThrow(() -> new UserNotFoundException());
 //		if (!Objects.equals(user.getId(), getCurrentUser().getId())) {
 //			throw new AccessForbiddenException();
 //		}
@@ -94,20 +93,43 @@ public class UserServiceImpl implements UserService {
 		return userRepository.save(user);
 	}
 
-	// to implement
 	@Override
-	public void deleteById(Long userId) {
-		userRoleRepository.deleteAllByUserId(userId);
-		userRepository.deleteById(userId);
+	public User getUserDetails() {
+		Long id = getCurrentUser().getId();
+		return userRepository.findById(id)
+				.orElseThrow(UserNotFoundException::new);
 	}
+
 
 	@Override
 	@Transactional
-	public void deleteByEmail(String email) {
-		Long userId = userRepository.findByEmail(email)
-				.orElseThrow(() -> new UserNotFoundException(email))
-				.getId();
-		userRoleRepository.deleteAllByUserId(userId);
-		userRepository.deleteByEmail(email);
+	public void delete() {
+		User user = userRepository.findById(getCurrentUser().getId())
+				.orElseThrow(UserNotFoundException::new);
+		if (!getProjectIdsOfUser(user).isEmpty()) {
+			throw new CannotProcessRequest("Unable to process the request. " +
+					"User has Admin or Manager assignments on the project(s)");
+		}
+		if (!getIssueIdsOfUser(user).isEmpty()) {
+			throw new CannotProcessRequest("Unable to process the request. " +
+					"User has assignments on the issue(s)");
+		}
+		userRoleRepository.deleteAllByUserId(user.getId());
+		userRepository.deleteById(user.getId());
+	}
+
+	private Set<Long> getIssueIdsOfUser(User user) {
+		return user.getIssueRoles().stream()
+				.filter(role -> role.getType() == IssueRoleType.ASSIGNEE)
+				.map(role -> role.getIssue().getId())
+				.collect(Collectors.toSet());
+	}
+
+	// find all project IDs where user is ADMIN or MANAGER
+	private Set<Long> getProjectIdsOfUser(User user) {
+		return user.getProjectRoles().stream()
+				.filter(role -> role.getType() != ProjectRoleType.VIEWER)
+				.map(role -> role.getProject().getId())
+				.collect(Collectors.toSet());
 	}
 }
