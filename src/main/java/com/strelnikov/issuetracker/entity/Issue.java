@@ -2,7 +2,6 @@ package com.strelnikov.issuetracker.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import org.hibernate.Hibernate;
 
 import java.time.LocalDate;
@@ -21,7 +20,6 @@ public class Issue {
 	@Column(name = "issue_key")
 	private String key;
 
-	@NotNull()
 	@NotBlank(message = "name field cannot be empty")
 	private String name;
 
@@ -51,7 +49,6 @@ public class Issue {
 
 	@Column(name="close_date")
 	private LocalDate closeDate;
-
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
 	@JoinTable(name = "issues_tags",

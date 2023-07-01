@@ -1,13 +1,15 @@
 package com.strelnikov.issuetracker.repository;
 
 import com.strelnikov.issuetracker.entity.Tag;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
 
 public interface TagRepository extends JpaRepository<Tag, Long> {
 
-    List<Tag> findByNameContaining(String name);
+    Page<Tag> findByNameContaining(String name, Pageable pageable);
+
+    Page<Tag> findAll(Pageable pageable);
 
     Tag findByName(String name);
 }

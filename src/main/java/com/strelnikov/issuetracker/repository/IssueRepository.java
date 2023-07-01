@@ -2,6 +2,8 @@ package com.strelnikov.issuetracker.repository;
 
 import com.strelnikov.issuetracker.entity.Issue;
 import com.strelnikov.issuetracker.entity.IssueStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -15,7 +17,7 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
             JOIN ProjectRole proj_role ON proj.id = proj_role.project.id
             WHERE proj_role.user.id = :userId
             """)
-    List<Issue> findAllByUserId(long userId);
+    Page<Issue> findAllByUserId(long userId, Pageable pageable);
 
     @Query("""
             SELECT issue from Issue issue
@@ -23,7 +25,7 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
             JOIN ProjectRole proj_role ON proj.id = proj_role.project.id
             WHERE proj_role.user.id = :userId AND issue.name LIKE :name
             """)
-    List<Issue> findByUserIdAndByNameContaining(Long userId, String name);
+    Page<Issue> findByUserIdAndByNameContaining(Long userId, String name, Pageable pageable);
 
     @Query("""
             SELECT issue from Issue issue
@@ -37,7 +39,16 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
             SELECT issue from Issue issue
             JOIN Project proj ON issue.project.id = proj.id
             JOIN ProjectRole proj_role ON proj.id = proj_role.project.id
+            WHERE proj_role.user.id = :userId AND issue.project.id=:projectId
+            """)
+    Page<Issue> findByUserIdAndByProjectId(long userId, Long projectId, Pageable pageable);
+
+    @Query("""
+            SELECT issue from Issue issue
+            JOIN Project proj ON issue.project.id = proj.id
+            JOIN ProjectRole proj_role ON proj.id = proj_role.project.id
             WHERE proj_role.user.id = :userId AND issue.status LIKE :status
             """)
-    List<Issue> findByUserIdAndByStatus(long userId, IssueStatus status);
+    Page<Issue> findByUserIdAndByStatus(long userId, IssueStatus status, Pageable pageable);
+
 }

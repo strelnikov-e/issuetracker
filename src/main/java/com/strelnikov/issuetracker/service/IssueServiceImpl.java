@@ -8,6 +8,8 @@ import com.strelnikov.issuetracker.exception.ProjectNotFoundException;
 import com.strelnikov.issuetracker.repository.IssueRepository;
 import com.strelnikov.issuetracker.repository.IssueRoleRepository;
 import com.strelnikov.issuetracker.repository.ProjectRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,18 +41,27 @@ public class IssueServiceImpl implements IssueService {
 	}
 
 	@Override
-	public List<Issue> findAll() {
+	public Page<Issue> findAll(Pageable pageable) {
 		long userId = userService.getCurrentUser().getId();
-		return issueRepository.findAllByUserId(userId);
+		return issueRepository.findAllByUserId(userId, pageable);
 	}
 
 	@Override
-	public List<Issue> findByName(String name) {
+	public Page<Issue> findByName(String name, Pageable pageable) {
 		if (name == null || name.equals("")) {
 			name = "";
 		}
 		long userId = userService.getCurrentUser().getId();
-		return issueRepository.findByUserIdAndByNameContaining(userId, name);
+		return issueRepository.findByUserIdAndByNameContaining(userId, name, pageable);
+	}
+
+	@Override
+	public Page<Issue> findByProjectId(Long projectId, Pageable pageable) {
+		if (!projectRepository.existsById(projectId)) {
+			throw new ProjectNotFoundException(projectId);
+		}
+		long userId = userService.getCurrentUser().getId();
+		return issueRepository.findByUserIdAndByProjectId(userId, projectId, pageable);
 	}
 
 	@Override
@@ -63,9 +74,9 @@ public class IssueServiceImpl implements IssueService {
 	}
 
 	@Override
-	public List<Issue> findByStatus(IssueStatus status) {
+	public Page<Issue> findByStatus(IssueStatus status, Pageable pageable) {
 		long userId = userService.getCurrentUser().getId();
-		return issueRepository.findByUserIdAndByStatus(userId ,status);
+		return issueRepository.findByUserIdAndByStatus(userId ,status, pageable);
 	}
 
 	@Override
@@ -157,3 +168,4 @@ public class IssueServiceImpl implements IssueService {
 		issueRepository.deleteById(issueId);
 	}
 }
+

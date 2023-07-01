@@ -7,5 +7,6 @@ create table `users`
 `first_name` varchar(50) NOT NULL,
 `last_name` varchar(50) NOT NULL, 
 `company_name` varchar(50),
+`current_project` bigint,
 PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

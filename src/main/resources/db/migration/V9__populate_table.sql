@@ -3,12 +3,12 @@ INSERT INTO `users` (`email`, `password`, `first_name`, `last_name`)
 VALUES
 		("root@mail.com",
         "{bcrypt}$2a$10$dooeahdr86sqvX/Fkqi7wevRfNON4uyVPWowu4OTDvbPVSas/PWla",
-        "Monica", "Hall"),
+        "Monica", "Hall", 0),
         ("admin@mail.com",
         "{bcrypt}$2a$10$dooeahdr86sqvX/Fkqi7wevRfNON4uyVPWowu4OTDvbPVSas/PWla",
-        "Richard", "Hendricks"),
+        "Richard", "Hendricks", 2),
         ("viewer@mail.com","{bcrypt}$2a$10$1FY7wUp3KzJd5X4iBfMdu.Fq2MvbeSJdjb3iv/moTFxlWqRhxJ1DG",
-        "Jared", "Dunn");
+        "Jared", "Dunn", 1);
 
 INSERT INTO `users_roles` (`user_id`, `type`)
 VALUES

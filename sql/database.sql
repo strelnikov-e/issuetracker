@@ -14,6 +14,7 @@ create table `users`
 `first_name` varchar(50) not null,
 `last_name` varchar(50) not null,
 `company_name` varchar(50),
+`current_project` bigint,
 PRIMARY KEY (`id`)
 ) 
 ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;

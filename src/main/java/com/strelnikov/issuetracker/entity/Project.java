@@ -3,12 +3,14 @@ package com.strelnikov.issuetracker.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import org.hibernate.Hibernate;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name="projects")
@@ -19,7 +21,6 @@ public class Project {
     private Long id;
 
     @Column
-    @NotNull
     @NotBlank(message = "Name cannot be blank")
     private String name;
 

@@ -27,8 +27,8 @@ public class User {
     @JsonIgnore
     private List<IssueRole> issueRoles = new ArrayList<>();
 
-
     @Column(columnDefinition = "char")
+    @JsonIgnore
     private String password;
 
     private boolean enabled = true;
@@ -41,6 +41,9 @@ public class User {
 
     @Column(name="company_name")
     private String companyName;
+
+    @Column(name="current_project")
+    private Long currentProject;
 
 
     public User() {
@@ -56,7 +59,7 @@ public class User {
                 String firstName, String lastName, String companyName) {
         this.email = email;
         this.password = password;
-        this.enabled = true;
+        this.enabled = isEnabled();
         this.firstName = firstName;
         this.lastName = lastName;
         this.companyName = companyName;
@@ -77,6 +80,14 @@ public class User {
         projectRole.setType(projectRoleType);
         projectRole.setUser(this);
         projectRoles.add(projectRole);
+    }
+
+    public Long getCurrentProject() {
+        return currentProject;
+    }
+
+    public void setCurrentProject(Long currentProject) {
+        this.currentProject = currentProject;
     }
 
     public List<ProjectRole> getProjectRoles() {

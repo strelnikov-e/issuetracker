@@ -2,6 +2,8 @@ package com.strelnikov.issuetracker.service;
 
 import com.strelnikov.issuetracker.entity.Issue;
 import com.strelnikov.issuetracker.entity.IssueStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
@@ -18,13 +20,15 @@ public interface IssueService {
 
     Issue findById(Long issueId);
 
-    List<Issue> findByName(String name);
+    Page<Issue> findByName(String name, Pageable pageable);
 
-    List<Issue> findByProjectId(Long projectId);
+    Page<Issue> findByProjectId(Long projectId, Pageable pageable);
 
     Issue patch(Long issueId, Map<String, Object> fields);
 
-    List<Issue> findAll();
+    Page<Issue> findAll(Pageable pageable);
 
-    List<Issue> findByStatus(IssueStatus status);
+    Page<Issue> findByStatus(IssueStatus status, Pageable pageable);
+
+    List<Issue> findByProjectId(Long projectId);
 }

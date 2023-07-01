@@ -6,9 +6,9 @@ import com.strelnikov.issuetracker.exception.IssueNotFoundException;
 import com.strelnikov.issuetracker.exception.TagNotFoundException;
 import com.strelnikov.issuetracker.repository.IssueRepository;
 import com.strelnikov.issuetracker.repository.TagRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class TagServiceImpl implements TagService {
@@ -47,10 +47,10 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<Tag> findByName(String name) {
+    public Page<Tag> findByName(String name, Pageable pageable) {
         if (name != null) {
-        return tagRepository.findByNameContaining(name);
+        return tagRepository.findByNameContaining(name, pageable);
         }
-        return tagRepository.findAll();
+        return tagRepository.findAll(pageable);
     }
 }

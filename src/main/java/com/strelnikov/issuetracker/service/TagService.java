@@ -1,8 +1,8 @@
 package com.strelnikov.issuetracker.service;
 
 import com.strelnikov.issuetracker.entity.Tag;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface TagService {
 
@@ -10,5 +10,5 @@ public interface TagService {
 
     Tag addTag(Long issueId, Tag tag);
 
-    List<Tag> findByName(String name);
+    Page<Tag> findByName(String name, Pageable pageable);
 }

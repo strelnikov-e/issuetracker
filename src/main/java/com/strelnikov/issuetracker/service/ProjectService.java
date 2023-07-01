@@ -2,20 +2,21 @@ package com.strelnikov.issuetracker.service;
 
 
 import com.strelnikov.issuetracker.entity.Project;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ProjectService {
 
-    List<Project> findByName(String name);
+    Page<Project> findAll(Pageable pageable);
 
-    Project update(Project project);
+    Page<Project> findByName(String name, Pageable pageable);
 
     Project findById(Long id);
+
+    Project update(Project project);
 
     void deleteById(Long projectId);
 
     Project create(Project project);
 
-    List<Project> findAll();
 }

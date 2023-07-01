@@ -1,55 +1,58 @@
 package com.strelnikov.issuetracker.controller;
 
 
+import com.strelnikov.issuetracker.controller.hateoas.UserModel;
+import com.strelnikov.issuetracker.controller.hateoas.UserModelAssembler;
 import com.strelnikov.issuetracker.entity.User;
 import com.strelnikov.issuetracker.service.UserService;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 public class UserRestController {
 
     private final UserService userService;
     private final UserModelAssembler assembler;
+    private final PagedResourcesAssembler<User> pagedResourcesAssembler;
 
 
-    public UserRestController(UserService userService, UserModelAssembler assembler) {
+    public UserRestController(UserService userService, UserModelAssembler assembler, PagedResourcesAssembler<User> pagedResourcesAssembler) {
         this.userService = userService;
         this.assembler = assembler;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
     /*
     Returns list of users assigned to the projects, where current user is MANAGER
 
      */
-    @GetMapping("/users")
-    public CollectionModel<EntityModel<User>> all(@RequestParam Map<String, Object> params) {
-        Set<EntityModel<User>> users = new HashSet<>();
-        if (params == null || params.isEmpty()) {
-            users = userService.findAll().stream()
-                    .map(assembler::toModel)
-                    .collect(Collectors.toSet());
-        }
+    @GetMapping
+    public CollectionModel<UserModel> all(@RequestParam Map<String, Object> params, Pageable pageable) {
+        List<UserModel> users;
+        users = userService.findAll().stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
 
-        return CollectionModel
-                .of(users, linkTo(methodOn(UserRestController.class)
-                        .all(params)).withSelfRel());
+        return CollectionModel.of(users)
+                .add( linkTo(methodOn(UserRestController.class).all(params, pageable)).withSelfRel());
     }
 
-    @GetMapping("/users/details")
-    public EntityModel<?> userDetails() {
+    @GetMapping("/details")
+    public UserModel userDetails() {
         User user = userService.getCurrentUser();
         return assembler.toModel(user);
     }
@@ -59,9 +62,9 @@ public class UserRestController {
     Open endpoint.
     Required fields: username, password, email, firstName, lastName
      */
-    @PostMapping("/users")
+    @PostMapping
     public ResponseEntity<?> create(@RequestBody User requestUser) {
-        EntityModel<User> entityModel = assembler.toModel(userService.save(requestUser));
+        UserModel entityModel = assembler.toModel(userService.save(requestUser));
         return ResponseEntity
                 .created(entityModel
                         .getRequiredLink(IanaLinkRelations.SELF)
@@ -73,15 +76,24 @@ public class UserRestController {
     Update user details.
     User details can be updated only by the user himself.
      */
-    @PutMapping("/users/{id}")
+    @PutMapping("/{id}")
     public  ResponseEntity<?> update(@PathVariable Long id, @RequestBody User request) {
-        EntityModel<User> entityModel = assembler.toModel(userService.update(id,request));
+        UserModel entityModel = assembler.toModel(userService.update(id,request));
         return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF)
                 .toUri())
                 .body(entityModel);
     }
 
-    @DeleteMapping("/users/delete")
+    @PatchMapping()
+    @ResponseStatus(HttpStatus.CREATED)
+    public void patch(@RequestBody Map<String, Object> fields) {
+        if (fields == null || fields.isEmpty()) {
+            throw new RequestRejectedException("Bad request. This may happen if request body is empty");
+        }
+        UserModel entityModel = assembler.toModel(userService.patch(fields));
+    }
+
+    @DeleteMapping("/delete")
     public ResponseEntity<?> delete() {
         userService.delete();
         return ResponseEntity.noContent().build();

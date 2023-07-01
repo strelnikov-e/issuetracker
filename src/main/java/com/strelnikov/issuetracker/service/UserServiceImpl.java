@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
     Returns list of users assigned to the projects, where current user is MANAGER or ADMIN
      */
 	@Override
-	public List<User> findAll() {
+	public Set<User> findAll() {
 		User user = userRepository.findById(getCurrentUser().getId())
 				.orElseThrow(UserNotFoundException::new);
 		Set<Long> projectIds = getProjectIdsOfUser(user);
@@ -53,12 +53,17 @@ public class UserServiceImpl implements UserService {
 		for (Long id : projectIds) {
 			users.addAll(userRepository.findByProjectId(id));
 		}
-		return users.stream().toList();
+		return users;
 	}
 
 	@Override
 	public UserDetails loadUserByEmail(String email) throws UserNotFoundException {
 		return null;
+	}
+
+	@Override
+	public User findByIssueRole(Long issueId, IssueRoleType role) {
+		return userRepository.findByIssueRole(issueId ,role).orElseGet(User::new);
 	}
 
 	@Override
@@ -90,6 +95,21 @@ public class UserServiceImpl implements UserService {
 		user.setLastName(requestUser.getLastName());
 		user.setCompanyName(requestUser.getCompanyName());
 		user.setEmail(requestUser.getEmail());
+		return userRepository.save(user);
+	}
+
+	@Override
+	public User patch(Map<String, Object> fields) {
+		User user = userRepository.findById(getCurrentUser().getId())
+				.orElseThrow(UserNotFoundException::new);
+		fields.forEach((k, v) -> {
+			switch (k) {
+				case "firstName" -> user.setFirstName(v.toString());
+				case "lastName" -> user.setLastName(v.toString());
+				case "companyName" -> user.setCompanyName(v.toString());
+				case "currentProject" -> user.setCurrentProject(Long.parseLong(v.toString()));
+				}
+		});
 		return userRepository.save(user);
 	}
 

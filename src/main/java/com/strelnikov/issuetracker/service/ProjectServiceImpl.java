@@ -7,6 +7,8 @@ import com.strelnikov.issuetracker.entity.User;
 import com.strelnikov.issuetracker.exception.ProjectNotFoundException;
 import com.strelnikov.issuetracker.repository.ProjectRepository;
 import com.strelnikov.issuetracker.repository.ProjectRoleRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -41,16 +43,16 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<Project> findAll() {
-        return projectRepository.findAllByUserId(userService.getCurrentUser().getId());
+    public Page<Project> findAll(Pageable pageable) {
+        return projectRepository.findAllByUserId(userService.getCurrentUser().getId(), pageable);
     }
 
     @Override
-    public List<Project> findByName(String name) {
+    public Page<Project> findByName(String name, Pageable pageable) {
         if (name == null) {
             name = "";
         }
-        return projectRepository.findByUserIdAndByNameContaining(getCurrentUser().getId(), name);
+        return projectRepository.findByUserIdAndByNameContaining(getCurrentUser().getId(), name, pageable);
     }
 
     @Override

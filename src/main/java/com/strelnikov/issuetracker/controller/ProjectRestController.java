@@ -1,25 +1,23 @@
 package com.strelnikov.issuetracker.controller;
 
+import com.strelnikov.issuetracker.controller.hateoas.ProjectModel;
+import com.strelnikov.issuetracker.controller.hateoas.ProjectModelAssembler;
 import com.strelnikov.issuetracker.entity.Project;
 import com.strelnikov.issuetracker.exception.ProjectNotFoundException;
 import com.strelnikov.issuetracker.service.ProjectService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api")
@@ -29,39 +27,29 @@ public class ProjectRestController {
 
     private final ProjectService projectService;
     private final ProjectModelAssembler assembler;
+    private final PagedResourcesAssembler<Project> pagedResourcesAssembler;
 
-    public ProjectRestController(ProjectService projectService, ProjectModelAssembler assembler) {
+    public ProjectRestController(ProjectService projectService, ProjectModelAssembler assembler, PagedResourcesAssembler<Project> pagedResourcesAssembler) {
         this.projectService = projectService;
         this.assembler = assembler;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
     /*
     Return list of the projects where current user any role.
-     */
+    */
     @GetMapping("/projects")
-    public CollectionModel<EntityModel<?>> all(@RequestParam Map<String, Object> params) {
-        List<EntityModel<?>> projects = new ArrayList<>();
-        if (params == null || params.isEmpty()) {
-            projects = projectService.findAll().stream()
-                    .map(assembler::toModel)
-                    .collect(Collectors.toList());;
+    public CollectionModel<ProjectModel> all(@RequestParam Map<String, Object> params, Pageable pageable) {
+
+        Page<Project> projects;
+        if (params.containsKey("name")) {
+            projects = projectService
+                    .findByName(params.get("name").toString() , pageable);
         } else {
-            for (var param: params.entrySet()) {
-                switch (param.getKey()) {
-                    case "name" -> projects = projectService.findByName(param.getValue().toString())
-                            .stream()
-                            .map(assembler::toModel)
-                            .collect(Collectors.toList());
-//                    case "manager" -> projects = projectService.findByManager(Long.parseLong(param.getValue().toString()))
-//                            .stream()
-//                            .map(assembler::toModel)
-//                            .collect(Collectors.toList());
-                }
-            }
+            projects = projectService
+                    .findAll(pageable);
         }
-        return CollectionModel
-                .of(projects, linkTo(methodOn(ProjectRestController.class)
-                        .all(params)).withSelfRel());
+        return pagedResourcesAssembler.toModel(projects, assembler);
     }
 
     /*
@@ -69,7 +57,7 @@ public class ProjectRestController {
      */
     @GetMapping("/projects/{projectId}")
     @PreAuthorize("@RoleService.hasAnyRoleByProjectId(#projectId, @ProjectRole.VIEWER)")
-    public EntityModel<Project> getById(@PathVariable Long projectId) {
+    public ProjectModel getById(@PathVariable Long projectId) {
         Project project = projectService.findById(projectId);
         if (project == null) {
             throw new ProjectNotFoundException(projectId);
@@ -84,7 +72,7 @@ public class ProjectRestController {
     @PostMapping("/projects")
     public ResponseEntity<?> createProject(@Valid @RequestBody Project project) {
         LOG.debug("POST request to create project: '{}'", project);
-        EntityModel<Project> entityModel = assembler.toModel(projectService.create(project));
+        ProjectModel entityModel = assembler.toModel(projectService.create(project));
         return ResponseEntity
                 .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
                 .body(entityModel);
@@ -99,7 +87,7 @@ public class ProjectRestController {
     public ResponseEntity<?> updateProject(@PathVariable Long projectId, @RequestBody Project project) {
         LOG.debug("PUT Request to update project with ID: '{}'. New values: '{}'", projectId, project.toString());
         project.setId(projectId);
-        EntityModel<Project> entityModel = assembler.toModel(projectService.update(project));
+        ProjectModel entityModel = assembler.toModel(projectService.update(project));
         return ResponseEntity
                 .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
                 .body(entityModel);

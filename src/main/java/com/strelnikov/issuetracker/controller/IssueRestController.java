@@ -1,24 +1,22 @@
 package com.strelnikov.issuetracker.controller;
 
+import com.strelnikov.issuetracker.controller.hateoas.IssueModel;
+import com.strelnikov.issuetracker.controller.hateoas.IssueModelAssembler;
 import com.strelnikov.issuetracker.entity.Issue;
 import com.strelnikov.issuetracker.entity.IssueStatus;
 import com.strelnikov.issuetracker.service.IssueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api")
@@ -29,11 +27,13 @@ public class IssueRestController {
     private final IssueService issueService;
     private final IssueModelAssembler assembler;
     private final IssueStatusModelAssembler issueStatusModelAssembler;
+    private final PagedResourcesAssembler<Issue> pagedResourcesAssembler;
 
-    public IssueRestController(IssueService issueService, IssueModelAssembler assembler, IssueStatusModelAssembler issueStatusModelAssembler) {
+    public IssueRestController(IssueService issueService, IssueModelAssembler assembler, IssueStatusModelAssembler issueStatusModelAssembler, PagedResourcesAssembler<Issue> pagedResourcesAssembler) {
         this.issueService = issueService;
         this.assembler = assembler;
         this.issueStatusModelAssembler = issueStatusModelAssembler;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
     /*
@@ -41,33 +41,23 @@ public class IssueRestController {
      */
     @GetMapping("/issues")
     @PreAuthorize("isAuthenticated")
-    public CollectionModel<EntityModel<?>> all(@RequestParam Map<String, Object> params) {
-        List<EntityModel<?>> issues = new ArrayList<>();
-        if (params == null || params.isEmpty()) {
-            issues = issueService.findAll().stream()
-                    .map(assembler::toModel)
-                    .collect(Collectors.toList());;
+    public CollectionModel<IssueModel> all(@RequestParam Map<String, Object> params, Pageable pageable) {
+
+        Page<Issue> issues;
+        if (params.containsKey("name")) {
+            issues = issueService
+                    .findByName(params.get("name").toString(), pageable);
+        } else if (params.containsKey("project")) {
+            issues = issueService
+                    .findByProjectId(Long.parseLong(params.get("project").toString()), pageable);
+        } else if (params.containsKey("status")) {
+            issues = issueService
+                    .findByStatus(IssueStatus.valueOf(params.get("status").toString()), pageable);
         } else {
-            for (var param: params.entrySet()) {
-                switch (param.getKey()) {
-                    case "name" -> issues = issueService.findByName(param.getValue().toString())
-                            .stream()
-                            .map(assembler::toModel)
-                            .collect(Collectors.toList());
-                    case "projectId" -> issues = issueService.findByProjectId(Long.parseLong(param.getValue().toString()))
-                            .stream()
-                            .map(assembler::toModel)
-                            .collect(Collectors.toList());
-                    case "status" -> issues = issueService.findByStatus(IssueStatus.valueOf(param.getValue().toString()))
-                            .stream()
-                            .map(assembler::toModel)
-                            .collect(Collectors.toList());
-                }
-            }
+            issues = issueService
+                    .findAll(pageable);
         }
-        return CollectionModel
-                .of(issues, linkTo(methodOn(IssueRestController.class)
-                        .all(params)).withSelfRel());
+        return pagedResourcesAssembler.toModel(issues, assembler);
     }
 
     /*
@@ -75,9 +65,9 @@ public class IssueRestController {
      */
     @GetMapping("/issues/{issueId}")
     @PreAuthorize("@RoleService.hasAnyRoleByIssueId(#issueId, @IssueRole.VIEWER)")
-    public EntityModel<Issue> getById(@PathVariable Long issueId) {
+    public IssueModel getById(@PathVariable Long issueId) {
         Issue issue = issueService.findById(issueId);
-        return assembler.toModel(issue) ;
+        return assembler.toModel(issue);
     }
 
     /*
@@ -90,7 +80,7 @@ public class IssueRestController {
     @PreAuthorize("@RoleService.hasAnyRoleByProjectId(#requestIssue.project.id, @ProjectRole.VIEWER)")
     public ResponseEntity<?> createIssue(@RequestBody Issue requestIssue) {
         LOG.debug("POST Request to create new issue: '{}'", requestIssue.toString());
-        EntityModel<Issue> entityModel = assembler.toModel(issueService.create(requestIssue));
+        IssueModel entityModel = assembler.toModel(issueService.create(requestIssue));
         return ResponseEntity
                 .created(entityModel
                         .getRequiredLink(IanaLinkRelations.SELF)
@@ -107,7 +97,7 @@ public class IssueRestController {
     @PreAuthorize("@RoleService.hasAnyRoleByIssueId(#issueId, @IssueRole.ASSIGNEE)")
     public ResponseEntity<?> updateIssue(@PathVariable Long issueId, @RequestBody Issue requestIssue) {
         LOG.debug("PUT Request to update issue with ID: '{}'. New values: '{}'", issueId, requestIssue.toString());
-        EntityModel<Issue> entityModel = assembler.toModel(issueService.update(issueId,requestIssue));
+        IssueModel entityModel = assembler.toModel(issueService.update(issueId,requestIssue));
          return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF)
                  .toUri())
                  .body(entityModel);
@@ -124,7 +114,7 @@ public class IssueRestController {
         if (issueId.compareTo(0L) < 1 || fields == null || fields.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
-        EntityModel<Issue> entityModel = assembler.toModel(issueService.patch(issueId, fields));
+        IssueModel entityModel = assembler.toModel(issueService.patch(issueId, fields));
         return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF)
                 .toUri())
                 .body(entityModel);
