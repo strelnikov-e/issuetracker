@@ -22,16 +22,16 @@ public class IssueRole {
     private Issue issue;
 
     @Enumerated(EnumType.STRING)
-    @Column(updatable = false)
-    private IssueRoleType type;
+    @Column(name="type", updatable = false)
+    private IssueRoleType role;
 
     public IssueRole() {
     }
 
-    public IssueRole(User user, Issue issue, IssueRoleType type) {
+    public IssueRole(User user, Issue issue, IssueRoleType role) {
         this.user = user;
         this.issue = issue;
-        this.type = type;
+        this.role = role;
     }
 
     @Override
@@ -73,11 +73,11 @@ public class IssueRole {
         this.issue = issue;
     }
 
-    public IssueRoleType getType() {
-        return type;
+    public IssueRoleType getRole() {
+        return role;
     }
 
-    public void setType(IssueRoleType type) {
-        this.type = type;
+    public void setRole(IssueRoleType role) {
+        this.role = role;
     }
 }

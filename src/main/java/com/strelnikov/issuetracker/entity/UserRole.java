@@ -19,14 +19,14 @@ public class UserRole {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
-    private UserRoleType type;
+    private UserRoleType role;
 
     public UserRole() {
     }
 
-    public UserRole(User user, UserRoleType type) {
+    public UserRole(User user, UserRoleType role) {
         this.user = user;
-        this.type = type;
+        this.role = role;
     }
 
     @Override
@@ -60,11 +60,11 @@ public class UserRole {
         this.user = user;
     }
 
-    public UserRoleType getType() {
-        return type;
+    public UserRoleType getRole() {
+        return role;
     }
 
-    public void setType(UserRoleType type) {
-        this.type = type;
+    public void setRole(UserRoleType role) {
+        this.role = role;
     }
 }

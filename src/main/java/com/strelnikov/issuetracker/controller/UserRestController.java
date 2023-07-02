@@ -38,12 +38,12 @@ public class UserRestController {
 
     /*
     Returns list of users assigned to the projects, where current user is MANAGER
-
      */
     @GetMapping
     public CollectionModel<UserModel> all(@RequestParam Map<String, Object> params, Pageable pageable) {
         List<UserModel> users;
-        users = userService.findAll().stream()
+        users = userService.findByProjectId(Long.parseLong(params.get("project").toString()))
+                .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
 

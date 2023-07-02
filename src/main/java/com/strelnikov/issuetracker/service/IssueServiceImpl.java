@@ -1,6 +1,7 @@
 package com.strelnikov.issuetracker.service;
 
 import com.strelnikov.issuetracker.config.RoleService;
+import com.strelnikov.issuetracker.controller.hateoas.IssueModel;
 import com.strelnikov.issuetracker.entity.*;
 import com.strelnikov.issuetracker.exception.AccessForbiddenException;
 import com.strelnikov.issuetracker.exception.IssueNotFoundException;
@@ -26,6 +27,7 @@ public class IssueServiceImpl implements IssueService {
 	private final UserService userService;
 	private final RoleService roleService;
 
+
 	public IssueServiceImpl(
 			IssueRepository issueRepository,
 			ProjectRepository projectRepository,
@@ -42,47 +44,87 @@ public class IssueServiceImpl implements IssueService {
 
 	@Override
 	public Page<Issue> findAll(Pageable pageable) {
-		long userId = userService.getCurrentUser().getId();
+		long userId = getUserId();
 		return issueRepository.findAllByUserId(userId, pageable);
 	}
 
 	@Override
-	public Page<Issue> findByName(String name, Pageable pageable) {
-		if (name == null || name.equals("")) {
-			name = "";
+	public Page<Issue> findByName(String name, Long projectId, Pageable pageable) {
+		if (projectId.equals(0L)) {
+			long userId = getUserId();
+			if (name == null || name.equals("")) {
+				return issueRepository.findAllByUserId(userId, pageable);
+			}
+			return issueRepository.findByUserIdAndByNameContaining(userId, name, pageable);
 		}
-		long userId = userService.getCurrentUser().getId();
-		return issueRepository.findByUserIdAndByNameContaining(userId, name, pageable);
+		return issueRepository.findByProjectIdAndNameContaining(projectId, name, pageable);
 	}
 
 	@Override
 	public Page<Issue> findByProjectId(Long projectId, Pageable pageable) {
-		if (!projectRepository.existsById(projectId)) {
-			throw new ProjectNotFoundException(projectId);
+		if (projectId == null || projectId.equals(0L)) {
+			long userId = getUserId();
+			return issueRepository.findAllByUserId(userId, pageable);
 		}
-		long userId = userService.getCurrentUser().getId();
-		return issueRepository.findByUserIdAndByProjectId(userId, projectId, pageable);
+			return issueRepository.findAllByProjectId(projectId, pageable);
 	}
 
 	@Override
 	public List<Issue> findByProjectId(Long projectId) {
-		if (!projectRepository.existsById(projectId)) {
-			throw new ProjectNotFoundException(projectId);
-		}
-		long userId = userService.getCurrentUser().getId();
+		long userId = getUserId();
 		return issueRepository.findByUserIdAndByProjectId(userId, projectId);
 	}
 
 	@Override
-	public Page<Issue> findByStatus(IssueStatus status, Pageable pageable) {
-		long userId = userService.getCurrentUser().getId();
-		return issueRepository.findByUserIdAndByStatus(userId ,status, pageable);
+	public Page<Issue> findByStatus(IssueStatus status, Long projectId, Pageable pageable) {
+		if (projectId.equals(0L)) {
+			long userId = getUserId();
+			return issueRepository.findByUserIdAndByStatus(userId, status, pageable);
+		}
+		return issueRepository.findByProjectIdAndStatus(projectId, status, pageable);
+	}
+
+	@Override
+	public Page<Issue> findByPriority(IssuePriority priority, Long projectId, Pageable pageable) {
+		if (projectId.equals(0L)) {
+			long userId = getUserId();
+			return issueRepository.findByUserIdAndByPriority(userId ,priority, pageable);
+		}
+		return issueRepository.findByProjectIdAndPriority(projectId, priority, pageable);
+	}
+
+	@Override
+	public Page<Issue> findByType(IssueType type, Long projectId, Pageable pageable) {
+		if (projectId.equals(0L)) {
+			long userId = getUserId();
+			return issueRepository.findByUserIdAndByType(userId, type, pageable);
+		}
+		return issueRepository.findByProjectIdAndType(projectId, type, pageable);
 	}
 
 	@Override
 	public Issue findById(Long issueId) {
 		return issueRepository.findById(issueId)
 				.orElseThrow(() -> new IssueNotFoundException(issueId));
+	}
+
+	@Override
+	public Page<Issue> findByUserRole(IssueRoleType role, Long assignee, Long projectId, Pageable pageable) {
+		if (projectId.equals(0L)) {
+			long userId = getUserId();
+			return issueRepository.findByUserIdAndByAssignee(role, assignee, userId, pageable);
+		}
+		return issueRepository.findByProjectIdAndByAssignee(role, assignee, projectId, pageable);
+	}
+
+	@Override
+	public Page<Issue> findBeforeDueDate(LocalDate dueDate, Long projectId, Pageable pageable) {
+		if (projectId.equals(0L)) {
+			long userId = getUserId();
+			return issueRepository.findByUserIdAndDueDateLessThan(userId, dueDate, pageable);
+		}
+		return issueRepository.findByProjectIdAndDueDateLessThanAndStatusNot(projectId, dueDate, IssueStatus.DONE, pageable);
+
 	}
 
 	@Override
@@ -116,7 +158,8 @@ public class IssueServiceImpl implements IssueService {
 	}
 
 	@Override
-	public Issue update(Long issueId, Issue requestIssue) {
+	@Transactional
+	public Issue update(Long issueId, IssueModel requestIssue) {
 		Issue issue = issueRepository.findById(issueId)
 				.orElseThrow(() -> new IssueNotFoundException(issueId));
 		if (requestIssue.getName() != null && !requestIssue.getName().isEmpty()) {
@@ -127,11 +170,20 @@ public class IssueServiceImpl implements IssueService {
 		issue.setStatus(requestIssue.getStatus());
 		issue.setType(requestIssue.getType());
 		issue.setPriority(requestIssue.getPriority());
-		issue.setTags(requestIssue.getTags());
 		issue.setStartDate(requestIssue.getStartDate());
 		issue.setDueDate(requestIssue.getDueDate());
 		issue.setCloseDate(requestIssue.getCloseDate());
 
+		if (requestIssue.getAssignee() == null
+				|| requestIssue.getAssignee().getId() == null
+				|| requestIssue.getAssignee().getId().equals(0L)) {
+			roleService.deleteUserRoleForIssue(issueId, IssueRoleType.ASSIGNEE);
+		}
+
+		roleService.changeUserRoleForIssue(
+				requestIssue.getAssignee().getId(),
+				requestIssue.getId(),
+				IssueRoleType.ASSIGNEE);
 		return issueRepository.save(issue);
 	}
 
@@ -150,6 +202,8 @@ public class IssueServiceImpl implements IssueService {
 				case "startDate" ->  issue.setStartDate(LocalDate.parse(v.toString()));
 				case "dueDate" ->  issue.setDueDate(LocalDate.parse(v.toString()));
 				case "closeDate" ->  issue.setCloseDate(LocalDate.parse(v.toString()));
+				case "assignee" -> roleService
+						.changeUserRoleForIssue(Long.parseLong(v.toString()), issueId, IssueRoleType.ASSIGNEE);
 			}
 		});
 		return issueRepository.save(issue);
@@ -166,6 +220,10 @@ public class IssueServiceImpl implements IssueService {
 
 		issueRoleRepository.deleteAllByIssueId(issueId);
 		issueRepository.deleteById(issueId);
+	}
+
+	private long getUserId() {
+		return userService.getCurrentUser().getId();
 	}
 }
 

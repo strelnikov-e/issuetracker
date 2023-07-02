@@ -1,10 +1,11 @@
 package com.strelnikov.issuetracker.service;
 
-import com.strelnikov.issuetracker.entity.Issue;
-import com.strelnikov.issuetracker.entity.IssueStatus;
+import com.strelnikov.issuetracker.controller.hateoas.IssueModel;
+import com.strelnikov.issuetracker.entity.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -16,11 +17,9 @@ public interface IssueService {
 
     Issue create(Issue issue);
 
-    Issue update(Long issueId, Issue requestIssue);
+    Issue update(Long issueId, IssueModel requestIssue);
 
     Issue findById(Long issueId);
-
-    Page<Issue> findByName(String name, Pageable pageable);
 
     Page<Issue> findByProjectId(Long projectId, Pageable pageable);
 
@@ -28,7 +27,17 @@ public interface IssueService {
 
     Page<Issue> findAll(Pageable pageable);
 
-    Page<Issue> findByStatus(IssueStatus status, Pageable pageable);
+    Page<Issue> findByName(String name, Long projectId, Pageable pageable);
 
     List<Issue> findByProjectId(Long projectId);
+
+    Page<Issue> findByStatus(IssueStatus status, Long projectId, Pageable pageable);
+
+    Page<Issue> findByPriority(IssuePriority priority, Long projectId, Pageable pageable);
+
+    Page<Issue> findByType(IssueType type, Long projectId, Pageable pageable);
+
+    Page<Issue> findByUserRole(IssueRoleType role, Long assignee, Long projectId, Pageable pageable);
+
+    Page<Issue> findBeforeDueDate(LocalDate dueDate, Long projectId, Pageable pageable);
 }

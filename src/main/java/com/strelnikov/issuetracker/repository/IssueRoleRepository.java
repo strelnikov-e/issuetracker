@@ -11,7 +11,7 @@ import java.util.Set;
 public interface IssueRoleRepository extends JpaRepository<IssueRole, Long> {
 
     @Query("""
-            SELECT ir.type FROM IssueRole ir
+            SELECT ir.role FROM IssueRole ir
             JOIN ir.issue i
             JOIN i.project p
             WHERE ir.user.id = :userId AND p.id = :projectId
@@ -19,10 +19,12 @@ public interface IssueRoleRepository extends JpaRepository<IssueRole, Long> {
     Set<IssueRoleType> findRoleTypesByUserIdAndProjectId(Long userId, Long projectId);
 
     @Query("""
-            SELECT ir.type FROM IssueRole ir
+            SELECT ir.role FROM IssueRole ir
             WHERE ir.user.id = :userId AND ir.issue.id = :issueId
             """)
     Set<IssueRoleType> findRoleTypesByUserIdAndIssueId(Long userId, Long issueId);
 
     void deleteAllByIssueId(Long issueId);
+
+    void deleteByIssueIdAndRole(Long issueId, IssueRoleType role);
 }

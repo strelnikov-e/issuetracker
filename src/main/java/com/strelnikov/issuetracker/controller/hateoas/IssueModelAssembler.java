@@ -37,7 +37,9 @@ public class IssueModelAssembler extends RepresentationModelAssemblerSupport<Iss
                 .withSelfRel());
         BeanUtils.copyProperties(entity, model);
         User assignee = userService.findByIssueRole(entity.getId(), IssueRoleType.ASSIGNEE);
+        User reporter = userService.findByIssueRole(entity.getId(), IssueRoleType.REPORTER);
         model.setAssignee(assembler.toModel(assignee));
+        model.setReporter(assembler.toModel(reporter));
         return model;
     }
 }

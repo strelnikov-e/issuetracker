@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -54,6 +55,11 @@ public class UserServiceImpl implements UserService {
 			users.addAll(userRepository.findByProjectId(id));
 		}
 		return users;
+	}
+
+	@Override
+	public List<User> findByProjectId(Long projectId) {
+		return userRepository.findByProjectId(projectId);
 	}
 
 	@Override
@@ -140,7 +146,7 @@ public class UserServiceImpl implements UserService {
 
 	private Set<Long> getIssueIdsOfUser(User user) {
 		return user.getIssueRoles().stream()
-				.filter(role -> role.getType() == IssueRoleType.ASSIGNEE)
+				.filter(role -> role.getRole() == IssueRoleType.ASSIGNEE)
 				.map(role -> role.getIssue().getId())
 				.collect(Collectors.toSet());
 	}
@@ -148,7 +154,7 @@ public class UserServiceImpl implements UserService {
 	// find all project IDs where user is ADMIN or MANAGER
 	private Set<Long> getProjectIdsOfUser(User user) {
 		return user.getProjectRoles().stream()
-				.filter(role -> role.getType() != ProjectRoleType.VIEWER)
+				.filter(role -> role.getRole() != ProjectRoleType.VIEWER)
 				.map(role -> role.getProject().getId())
 				.collect(Collectors.toSet());
 	}

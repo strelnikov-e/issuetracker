@@ -12,17 +12,17 @@ VALUES
         ("viewer@mail.com","{bcrypt}$2a$10$1FY7wUp3KzJd5X4iBfMdu.Fq2MvbeSJdjb3iv/moTFxlWqRhxJ1DG",
         "Jared", "Dunn", 1);
         
-INSERT INTO `users_roles` (`user_id`, `type`)
+INSERT INTO `users_roles` (`user_id`, `role`)
 VALUES
         (1 , 'ROOT');
 
-INSERT INTO `projects_roles` (`user_id`, `project_id`, `type`)
+INSERT INTO `projects_roles` (`user_id`, `project_id`, `role`)
 VALUES
         (2, 1, 'ADMIN'),
         (2, 2, 'MANAGER'),
         (3, 1, 'VIEWER');
         
-INSERT INTO `issues_roles` (`user_id`, `issue_id`, `type`)
+INSERT INTO `issues_roles` (`user_id`, `issue_id`, `role`)
 VALUES
         (3, 1, 'ASSIGNEE'),
         (2, 2, 'ASSIGNEE'),

@@ -69,7 +69,7 @@ public class User {
     public void addIssueRole(Issue issue, IssueRoleType issueRoleType) {
         final var issueRole = new IssueRole(this, issue, issueRoleType);
         issueRole.setIssue(issue);
-        issueRole.setType(issueRoleType);
+        issueRole.setRole(issueRoleType);
         issueRole.setUser(this);
         issueRoles.add(issueRole);
     }
@@ -77,7 +77,7 @@ public class User {
     public void addProjectRole(Project project, ProjectRoleType projectRoleType) {
         final var projectRole = new ProjectRole();
         projectRole.setProject(project);
-        projectRole.setType(projectRoleType);
+        projectRole.setRole(projectRoleType);
         projectRole.setUser(this);
         projectRoles.add(projectRole);
     }

@@ -1,9 +1,9 @@
 package com.strelnikov.issuetracker.controller;
 
+import com.strelnikov.issuetracker.config.RoleService;
 import com.strelnikov.issuetracker.controller.hateoas.IssueModel;
 import com.strelnikov.issuetracker.controller.hateoas.IssueModelAssembler;
-import com.strelnikov.issuetracker.entity.Issue;
-import com.strelnikov.issuetracker.entity.IssueStatus;
+import com.strelnikov.issuetracker.entity.*;
 import com.strelnikov.issuetracker.service.IssueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 @RestController
@@ -24,12 +25,14 @@ public class IssueRestController {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProjectRestController.class);
 
+    private final RoleService roleService;
     private final IssueService issueService;
     private final IssueModelAssembler assembler;
     private final IssueStatusModelAssembler issueStatusModelAssembler;
     private final PagedResourcesAssembler<Issue> pagedResourcesAssembler;
 
-    public IssueRestController(IssueService issueService, IssueModelAssembler assembler, IssueStatusModelAssembler issueStatusModelAssembler, PagedResourcesAssembler<Issue> pagedResourcesAssembler) {
+    public IssueRestController(RoleService roleService, IssueService issueService, IssueModelAssembler assembler, IssueStatusModelAssembler issueStatusModelAssembler, PagedResourcesAssembler<Issue> pagedResourcesAssembler) {
+        this.roleService = roleService;
         this.issueService = issueService;
         this.assembler = assembler;
         this.issueStatusModelAssembler = issueStatusModelAssembler;
@@ -44,18 +47,39 @@ public class IssueRestController {
     public CollectionModel<IssueModel> all(@RequestParam Map<String, Object> params, Pageable pageable) {
 
         Page<Issue> issues;
-        if (params.containsKey("name")) {
+        Long projectId = Long.parseLong(params.getOrDefault("project", 0L).toString());
+
+        if (!projectId.equals(0L) && !roleService.hasAnyRoleByProjectId(projectId, ProjectRoleType.VIEWER)) {
+            // check if current user has right to see issues of the project
+            // if query doesn't specify -> return issues for all project available for user by his role
+            issues = Page.empty();
+        } else if (params.containsKey("name")) {
             issues = issueService
-                    .findByName(params.get("name").toString(), pageable);
-        } else if (params.containsKey("project")) {
-            issues = issueService
-                    .findByProjectId(Long.parseLong(params.get("project").toString()), pageable);
+                    .findByName(params.get("name").toString(), projectId, pageable);
         } else if (params.containsKey("status")) {
             issues = issueService
-                    .findByStatus(IssueStatus.valueOf(params.get("status").toString()), pageable);
+                    .findByStatus(IssueStatus.valueOf(params.get("status").toString()), projectId, pageable);
+        } else if (params.containsKey("priority")) {
+            issues = issueService
+                    .findByPriority(IssuePriority.valueOf(params.get("priority").toString()), projectId, pageable);
+        } else if (params.containsKey("type")) {
+            issues = issueService
+                    .findByType(IssueType.valueOf(params.get("type").toString()), projectId, pageable);
+        } else if (params.containsKey("overdue")) {
+            issues = issueService
+                    .findByType(IssueType.valueOf(params.get("type").toString()), projectId, pageable);
+        } else if (params.containsKey("assignee")) {
+            issues = issueService
+                    .findByUserRole(IssueRoleType.ASSIGNEE, Long.parseLong(params.getOrDefault("assignee", 0L).toString()), projectId, pageable);
+        } else if (params.containsKey("reporter")) {
+            issues = issueService
+                    .findByUserRole(IssueRoleType.REPORTER, Long.parseLong(params.getOrDefault("reporter", 0L).toString()), projectId, pageable);
+        } else if (params.containsKey("dueDate")) {
+            issues = issueService
+                    .findBeforeDueDate(LocalDate.parse(params.get("dueDate").toString()), projectId, pageable);
         } else {
             issues = issueService
-                    .findAll(pageable);
+                    .findByProjectId(projectId, pageable);
         }
         return pagedResourcesAssembler.toModel(issues, assembler);
     }
@@ -95,9 +119,9 @@ public class IssueRestController {
      */
     @PutMapping("/issues/{issueId}")
     @PreAuthorize("@RoleService.hasAnyRoleByIssueId(#issueId, @IssueRole.ASSIGNEE)")
-    public ResponseEntity<?> updateIssue(@PathVariable Long issueId, @RequestBody Issue requestIssue) {
+    public ResponseEntity<?> updateIssue(@PathVariable Long issueId, @RequestBody IssueModel requestIssue) {
         LOG.debug("PUT Request to update issue with ID: '{}'. New values: '{}'", issueId, requestIssue.toString());
-        IssueModel entityModel = assembler.toModel(issueService.update(issueId,requestIssue));
+        IssueModel entityModel = assembler.toModel(issueService.update(issueId, requestIssue));
          return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF)
                  .toUri())
                  .body(entityModel);

@@ -10,13 +10,13 @@ import java.util.Set;
 
 public interface ProjectRoleRepository extends JpaRepository<ProjectRole, Long> {
     @Query("""
-        SELECT pr.type FROM ProjectRole pr
+        SELECT pr.role FROM ProjectRole pr
         WHERE pr.user.id = :userId AND pr.project.id = :projectId
         """)
     Set<ProjectRoleType> findRoleTypesByUserIdAndProjectId(Long userId, Long projectId);
 
     @Query("""
-        SELECT pr.type FROM ProjectRole pr
+        SELECT pr.role FROM ProjectRole pr
         JOIN pr.project p
         JOIN p.issues i
         WHERE pr.user.id = :userId AND i.id = :issueId

@@ -20,6 +20,7 @@ public class IssueModel extends RepresentationModel<IssueModel> {
     private LocalDate dueDate;
     private LocalDate closeDate;
     private UserModel assignee;
+    private UserModel reporter;
 
     public Long getId() {
         return id;
@@ -123,5 +124,13 @@ public class IssueModel extends RepresentationModel<IssueModel> {
 
     public void setAssignee(UserModel assignee) {
         this.assignee = assignee;
+    }
+
+    public UserModel getReporter() {
+        return reporter;
+    }
+
+    public void setReporter(UserModel reporter) {
+        this.reporter = reporter;
     }
 }

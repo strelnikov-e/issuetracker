@@ -31,14 +31,15 @@ public interface UserRepository extends CrudRepository<User, Long> {
     @Query("""
             SELECT user FROM User user
             JOIN ProjectRole proj_role on user.id=proj_role.user.id
-            WHERE proj_role.project.id = :id and proj_role.type = :roleType
+            WHERE proj_role.project.id = :id and proj_role.role = :roleType
             """)
     List<User> findViewersByProjectId(Long id, ProjectRoleType roleType, Pageable pageable);
 
     @Query("""
             SELECT user FROM User user
             JOIN IssueRole issue_role on user.id=issue_role.user.id
-            WHERE issue_role.issue.id = :issueId and issue_role.type = :role
+            WHERE issue_role.issue.id = :issueId and issue_role.role = :role
             """)
     Optional<User> findByIssueRole(Long issueId, IssueRoleType role);
+
 }

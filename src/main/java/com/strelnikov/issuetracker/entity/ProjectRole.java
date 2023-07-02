@@ -22,16 +22,16 @@ public class ProjectRole {
     private Project project;
 
     @Enumerated(EnumType.STRING)
-    @Column(updatable = false)
-    private ProjectRoleType type;
+    @Column(name="type", updatable = false)
+    private ProjectRoleType role;
 
     public ProjectRole() {
     }
 
-    public ProjectRole(User user, Project project, ProjectRoleType type) {
+    public ProjectRole(User user, Project project, ProjectRoleType role) {
         this.user = user;
         this.project = project;
-        this.type = type;
+        this.role = role;
     }
 
     @Override
@@ -73,11 +73,11 @@ public class ProjectRole {
         this.project = project;
     }
 
-    public ProjectRoleType getType() {
-        return type;
+    public ProjectRoleType getRole() {
+        return role;
     }
 
-    public void setType(ProjectRoleType type) {
-        this.type = type;
+    public void setRole(ProjectRoleType role) {
+        this.role = role;
     }
 }
