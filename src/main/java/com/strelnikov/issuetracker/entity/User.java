@@ -42,8 +42,9 @@ public class User {
     @Column(name="company_name")
     private String companyName;
 
-    @Column(name="current_project")
-    private Long currentProject;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "current_project", referencedColumnName = "id")
+    private Project currentProject;
 
 
     public User() {
@@ -82,11 +83,11 @@ public class User {
         projectRoles.add(projectRole);
     }
 
-    public Long getCurrentProject() {
+    public Project getCurrentProject() {
         return currentProject;
     }
 
-    public void setCurrentProject(Long currentProject) {
+    public void setCurrentProject(Project currentProject) {
         this.currentProject = currentProject;
     }
 

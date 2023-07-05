@@ -49,24 +49,39 @@ public class IssueServiceImpl implements IssueService {
 	}
 
 	@Override
-	public Page<Issue> findByName(String name, Long projectId, Pageable pageable) {
+	public Page<Issue> findByName(String name, Long projectId, Boolean incomplete, Pageable pageable) {
 		if (projectId.equals(0L)) {
 			long userId = getUserId();
 			if (name == null || name.equals("")) {
+				if (incomplete) {
+					return issueRepository.findAllByUserIdAndByStatusNot(userId, IssueStatus.DONE, pageable);
+				}
 				return issueRepository.findAllByUserId(userId, pageable);
 			}
+			if (incomplete) {
+				return issueRepository.findByUserIdAndNameContainingAndStatusNot(userId, name, IssueStatus.DONE, pageable);
+			}
 			return issueRepository.findByUserIdAndByNameContaining(userId, name, pageable);
+		}
+		if (incomplete) {
+			return issueRepository.findByProjectIdAndNameContainingAndStatusNot(projectId, name, IssueStatus.DONE, pageable);
 		}
 		return issueRepository.findByProjectIdAndNameContaining(projectId, name, pageable);
 	}
 
 	@Override
-	public Page<Issue> findByProjectId(Long projectId, Pageable pageable) {
+	public Page<Issue> findByProjectId(Long projectId,Boolean incomplete, Pageable pageable) {
 		if (projectId == null || projectId.equals(0L)) {
 			long userId = getUserId();
+			if (incomplete) {
+				return issueRepository.findAllByUserIdAndStatusNot(userId, IssueStatus.DONE, pageable);
+			}
 			return issueRepository.findAllByUserId(userId, pageable);
 		}
-			return issueRepository.findAllByProjectId(projectId, pageable);
+		if (incomplete) {
+			return issueRepository.findAllByProjectIdAndStatusNot(projectId, IssueStatus.DONE, pageable);
+		}
+		return issueRepository.findAllByProjectId(projectId, pageable);
 	}
 
 	@Override
@@ -85,19 +100,31 @@ public class IssueServiceImpl implements IssueService {
 	}
 
 	@Override
-	public Page<Issue> findByPriority(IssuePriority priority, Long projectId, Pageable pageable) {
+	public Page<Issue> findByPriority(IssuePriority priority, Long projectId, Boolean incomplete, Pageable pageable) {
 		if (projectId.equals(0L)) {
 			long userId = getUserId();
-			return issueRepository.findByUserIdAndByPriority(userId ,priority, pageable);
+			if (!incomplete) {
+				return issueRepository.findByUserIdAndPriorityAndStatusNot(userId, priority, IssueStatus.DONE, pageable);
+			}
+			return issueRepository.findByUserIdAndByPriority(userId, priority, pageable);
+		}
+		if (incomplete) {
+			return issueRepository.findByProjectIdAndPriorityAndStatusNot(projectId, priority, IssueStatus.DONE, pageable);
 		}
 		return issueRepository.findByProjectIdAndPriority(projectId, priority, pageable);
 	}
 
 	@Override
-	public Page<Issue> findByType(IssueType type, Long projectId, Pageable pageable) {
+	public Page<Issue> findByType(IssueType type, Long projectId, Boolean incomplete, Pageable pageable) {
 		if (projectId.equals(0L)) {
 			long userId = getUserId();
+			if (incomplete) {
+				return issueRepository.findByUserIdAndTypeAndStatusNot(userId, type, IssueStatus.DONE, pageable);
+			}
 			return issueRepository.findByUserIdAndByType(userId, type, pageable);
+		}
+		if (incomplete){
+			return issueRepository.findByProjectIdAndTypeAndStatusNot(projectId, type, IssueStatus.DONE, pageable);
 		}
 		return issueRepository.findByProjectIdAndType(projectId, type, pageable);
 	}
@@ -109,21 +136,33 @@ public class IssueServiceImpl implements IssueService {
 	}
 
 	@Override
-	public Page<Issue> findByUserRole(IssueRoleType role, Long assignee, Long projectId, Pageable pageable) {
+	public Page<Issue> findByUserRole(IssueRoleType role, Long assignee, Long projectId, Boolean incomplete, Pageable pageable) {
 		if (projectId.equals(0L)) {
 			long userId = getUserId();
+			if (incomplete) {
+				return issueRepository.findByUserIdAndAssigneeAndStatusNot(role, assignee, userId, IssueStatus.DONE, pageable);
+			}
 			return issueRepository.findByUserIdAndByAssignee(role, assignee, userId, pageable);
+		}
+		if (incomplete) {
+			return issueRepository.findByProjectIdAndByAssigneeAndStatusNot(role, assignee, projectId, IssueStatus.DONE, pageable);
 		}
 		return issueRepository.findByProjectIdAndByAssignee(role, assignee, projectId, pageable);
 	}
 
 	@Override
-	public Page<Issue> findBeforeDueDate(LocalDate dueDate, Long projectId, Pageable pageable) {
+	public Page<Issue> findBeforeDueDate(LocalDate dueDate, Long projectId, Boolean incomplete, Pageable pageable) {
 		if (projectId.equals(0L)) {
 			long userId = getUserId();
+			if (incomplete) {
+				return issueRepository.findByUserIdAndDueDateLessThanAndStatusNot(userId, dueDate, IssueStatus.DONE, pageable);
+			}
 			return issueRepository.findByUserIdAndDueDateLessThan(userId, dueDate, pageable);
 		}
-		return issueRepository.findByProjectIdAndDueDateLessThanAndStatusNot(projectId, dueDate, IssueStatus.DONE, pageable);
+		if (incomplete) {
+			return issueRepository.findByProjectIdAndDueDateLessThanAndStatusNot(projectId, dueDate, IssueStatus.DONE, pageable);
+		}
+		return issueRepository.findByProjectIdAndDueDateLessThan(projectId, dueDate, pageable);
 
 	}
 
@@ -178,12 +217,12 @@ public class IssueServiceImpl implements IssueService {
 				|| requestIssue.getAssignee().getId() == null
 				|| requestIssue.getAssignee().getId().equals(0L)) {
 			roleService.deleteUserRoleForIssue(issueId, IssueRoleType.ASSIGNEE);
+		} else {
+			roleService.changeUserRoleForIssue(
+					requestIssue.getAssignee().getId(),
+					requestIssue.getId(),
+					IssueRoleType.ASSIGNEE);
 		}
-
-		roleService.changeUserRoleForIssue(
-				requestIssue.getAssignee().getId(),
-				requestIssue.getId(),
-				IssueRoleType.ASSIGNEE);
 		return issueRepository.save(issue);
 	}
 

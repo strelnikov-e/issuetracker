@@ -22,7 +22,7 @@ public class IssueRole {
     private Issue issue;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="type", updatable = false)
+    @Column(updatable = false)
     private IssueRoleType role;
 
     public IssueRole() {
@@ -32,11 +32,6 @@ public class IssueRole {
         this.user = user;
         this.issue = issue;
         this.role = role;
-    }
-
-    @Override
-    public int hashCode() {
-        return this.hashCode();
     }
 
     @Override

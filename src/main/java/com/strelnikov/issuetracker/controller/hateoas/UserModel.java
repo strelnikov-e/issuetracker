@@ -1,5 +1,6 @@
 package com.strelnikov.issuetracker.controller.hateoas;
 
+import com.strelnikov.issuetracker.entity.Project;
 import org.springframework.hateoas.RepresentationModel;
 
 public class UserModel extends RepresentationModel<UserModel> {
@@ -8,7 +9,7 @@ public class UserModel extends RepresentationModel<UserModel> {
     private String firstName;
     private String lastName;
     private String companyName;
-    private Long currentProject;
+    private Project currentProject;
 
     public Long getId() {
         return id;
@@ -42,11 +43,11 @@ public class UserModel extends RepresentationModel<UserModel> {
         this.companyName = companyName;
     }
 
-    public Long getCurrentProject() {
+    public Project getCurrentProject() {
         return currentProject;
     }
 
-    public void setCurrentProject(Long currentProject) {
+    public void setCurrentProject(Project currentProject) {
         this.currentProject = currentProject;
     }
 }

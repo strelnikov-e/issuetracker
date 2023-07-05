@@ -22,6 +22,8 @@ public interface UserService {
 
     List<User> findByProjectId(Long projectId);
 
+    List<User> findByProjectIdAndIssueRole(long projectId, IssueRoleType issueRole);
+
     User save(User user);
 
     User update(Long id, User user);

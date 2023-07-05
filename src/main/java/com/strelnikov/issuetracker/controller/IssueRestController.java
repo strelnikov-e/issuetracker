@@ -48,6 +48,7 @@ public class IssueRestController {
 
         Page<Issue> issues;
         Long projectId = Long.parseLong(params.getOrDefault("project", 0L).toString());
+        Boolean incomplete = params.containsKey("incomplete");
 
         if (!projectId.equals(0L) && !roleService.hasAnyRoleByProjectId(projectId, ProjectRoleType.VIEWER)) {
             // check if current user has right to see issues of the project
@@ -55,31 +56,28 @@ public class IssueRestController {
             issues = Page.empty();
         } else if (params.containsKey("name")) {
             issues = issueService
-                    .findByName(params.get("name").toString(), projectId, pageable);
+                    .findByName(params.get("name").toString(), projectId, incomplete, pageable);
         } else if (params.containsKey("status")) {
             issues = issueService
                     .findByStatus(IssueStatus.valueOf(params.get("status").toString()), projectId, pageable);
         } else if (params.containsKey("priority")) {
             issues = issueService
-                    .findByPriority(IssuePriority.valueOf(params.get("priority").toString()), projectId, pageable);
+                    .findByPriority(IssuePriority.valueOf(params.get("priority").toString()), projectId, incomplete, pageable);
         } else if (params.containsKey("type")) {
             issues = issueService
-                    .findByType(IssueType.valueOf(params.get("type").toString()), projectId, pageable);
-        } else if (params.containsKey("overdue")) {
-            issues = issueService
-                    .findByType(IssueType.valueOf(params.get("type").toString()), projectId, pageable);
+                    .findByType(IssueType.valueOf(params.get("type").toString()), projectId, incomplete, pageable);
         } else if (params.containsKey("assignee")) {
             issues = issueService
-                    .findByUserRole(IssueRoleType.ASSIGNEE, Long.parseLong(params.getOrDefault("assignee", 0L).toString()), projectId, pageable);
+                    .findByUserRole(IssueRoleType.ASSIGNEE, Long.parseLong(params.get("assignee").toString()), projectId, incomplete, pageable);
         } else if (params.containsKey("reporter")) {
             issues = issueService
-                    .findByUserRole(IssueRoleType.REPORTER, Long.parseLong(params.getOrDefault("reporter", 0L).toString()), projectId, pageable);
+                    .findByUserRole(IssueRoleType.REPORTER, Long.parseLong(params.get("reporter").toString()), projectId, incomplete, pageable);
         } else if (params.containsKey("dueDate")) {
             issues = issueService
-                    .findBeforeDueDate(LocalDate.parse(params.get("dueDate").toString()), projectId, pageable);
+                    .findBeforeDueDate(LocalDate.parse(params.get("dueDate").toString()), projectId, incomplete, pageable);
         } else {
             issues = issueService
-                    .findByProjectId(projectId, pageable);
+                    .findByProjectId(projectId, incomplete, pageable);
         }
         return pagedResourcesAssembler.toModel(issues, assembler);
     }

@@ -4,8 +4,10 @@ import com.strelnikov.issuetracker.entity.IssueRoleType;
 import com.strelnikov.issuetracker.entity.ProjectRoleType;
 import com.strelnikov.issuetracker.entity.User;
 import com.strelnikov.issuetracker.exception.CannotProcessRequest;
+import com.strelnikov.issuetracker.exception.ProjectNotFoundException;
 import com.strelnikov.issuetracker.exception.UserAlreadyExistsException;
 import com.strelnikov.issuetracker.exception.UserNotFoundException;
+import com.strelnikov.issuetracker.repository.ProjectRepository;
 import com.strelnikov.issuetracker.repository.UserRepository;
 import com.strelnikov.issuetracker.repository.UserRoleRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,11 +30,13 @@ public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 	private final UserRoleRepository userRoleRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final ProjectRepository projectRepository;
 	
-	public UserServiceImpl(UserRepository userRepository, UserRoleRepository userRoleRepository, PasswordEncoder passwordEncoder) {
+	public UserServiceImpl(UserRepository userRepository, UserRoleRepository userRoleRepository, PasswordEncoder passwordEncoder, ProjectRepository projectRepository) {
 		this.userRepository = userRepository;
 		this.userRoleRepository = userRoleRepository;
 		this.passwordEncoder = passwordEncoder;
+		this.projectRepository = projectRepository;
 	}
 
 	public User getCurrentUser() {
@@ -63,13 +67,18 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public List<User> findByProjectIdAndIssueRole(long projectId, IssueRoleType issueRole) {
+		return userRepository.findByProjectIdAndIssueRoleType(projectId, issueRole);
+	}
+
+	@Override
 	public UserDetails loadUserByEmail(String email) throws UserNotFoundException {
 		return null;
 	}
 
 	@Override
 	public User findByIssueRole(Long issueId, IssueRoleType role) {
-		return userRepository.findByIssueRole(issueId ,role).orElseGet(User::new);
+		return userRepository.findByIssueAndRole(issueId ,role).orElseGet(User::new);
 	}
 
 	@Override
@@ -113,7 +122,8 @@ public class UserServiceImpl implements UserService {
 				case "firstName" -> user.setFirstName(v.toString());
 				case "lastName" -> user.setLastName(v.toString());
 				case "companyName" -> user.setCompanyName(v.toString());
-				case "currentProject" -> user.setCurrentProject(Long.parseLong(v.toString()));
+				case "currentProject" -> user.setCurrentProject(projectRepository.findById(Long.parseLong(v.toString()))
+						.orElseThrow(() -> new ProjectNotFoundException(Long.parseLong(v.toString()))));
 				}
 		});
 		return userRepository.save(user);

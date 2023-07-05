@@ -10,6 +10,8 @@ import java.util.Set;
 
 public interface IssueRoleRepository extends JpaRepository<IssueRole, Long> {
 
+    IssueRole findByIssueIdAndRole(Long issueId, IssueRoleType role);
+
     @Query("""
             SELECT ir.role FROM IssueRole ir
             JOIN ir.issue i

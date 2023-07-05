@@ -3,6 +3,7 @@ package com.strelnikov.issuetracker.controller;
 
 import com.strelnikov.issuetracker.controller.hateoas.UserModel;
 import com.strelnikov.issuetracker.controller.hateoas.UserModelAssembler;
+import com.strelnikov.issuetracker.entity.IssueRoleType;
 import com.strelnikov.issuetracker.entity.User;
 import com.strelnikov.issuetracker.service.UserService;
 import org.springframework.data.domain.Pageable;
@@ -42,10 +43,18 @@ public class UserRestController {
     @GetMapping
     public CollectionModel<UserModel> all(@RequestParam Map<String, Object> params, Pageable pageable) {
         List<UserModel> users;
-        users = userService.findByProjectId(Long.parseLong(params.get("project").toString()))
-                .stream()
-                .map(assembler::toModel)
-                .collect(Collectors.toList());
+        Long projectId = Long.parseLong(params.getOrDefault("project", 0L).toString());
+        if (params.containsKey("issueRole")) {
+            users = userService.findByProjectIdAndIssueRole(projectId, IssueRoleType.valueOf(params.get("issueRole").toString()))
+                    .stream()
+                    .map(assembler::toModel)
+                    .collect(Collectors.toList());
+        } else {
+            users = userService.findByProjectId(projectId)
+                    .stream()
+                    .map(assembler::toModel)
+                    .collect(Collectors.toList());
+        }
 
         return CollectionModel.of(users)
                 .add( linkTo(methodOn(UserRestController.class).all(params, pageable)).withSelfRel());

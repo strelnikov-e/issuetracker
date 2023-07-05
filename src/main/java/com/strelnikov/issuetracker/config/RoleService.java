@@ -84,6 +84,7 @@ public class RoleService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
+    // this method showld be used to change assignee userId only! Needs refactoring
     @Transactional
     public void changeUserRoleForIssue(Long userId, Long issueId, IssueRoleType role) {
         // fetch user by id
@@ -92,13 +93,33 @@ public class RoleService {
         // fetch issue by id
         Issue issue = issueRepository.findById(issueId)
                 .orElseThrow(() -> new IssueNotFoundException(issueId));
-        IssueRole entry = new IssueRole(user, issue, role);
-        // delete previous entry for role and issue
-        issueRoleRepository.deleteByIssueIdAndRole(issueId, role);
-        // save new entry into the database
-        issueRoleRepository.save(entry);
+
+        IssueRole issueRole = issueRoleRepository.findByIssueIdAndRole(issueId, IssueRoleType.ASSIGNEE);
+        if (issueRole != null && issueRole.getUser().getId().equals(userId)) {
+            return;
+        }
+
+        deleteUserRoleForIssue(issueId,IssueRoleType.ASSIGNEE);
+        if (role == IssueRoleType.ASSIGNEE) {
+            IssueRole entry = new IssueRole(user, issue, role);
+            issueRoleRepository.saveAndFlush(entry);
+        }
+//        if (role == null) {
+//            issueRoleRepository.deleteByIssueIdAndRole(issueId, IssueRoleType.ASSIGNEE);
+//            return;
+//        }
+
+//        IssueRole entry = issueRoleRepository.findByIssueIdAndRole(issueId, role);
+//        if (entry == null) {
+//            entry = new IssueRole(user, issue, role);
+//        } else {
+//            entry.setUser(user);
+//        }
+
+//        issueRoleRepository.save(entry);
     }
 
+    @Transactional
     public void deleteUserRoleForIssue(Long issueId, IssueRoleType role) {
         issueRoleRepository.deleteByIssueIdAndRole(issueId, role);
     }

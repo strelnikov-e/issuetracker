@@ -21,23 +21,23 @@ public interface IssueService {
 
     Issue findById(Long issueId);
 
-    Page<Issue> findByProjectId(Long projectId, Pageable pageable);
+    Page<Issue> findByProjectId(Long projectId, Boolean incomplete, Pageable pageable);
 
     Issue patch(Long issueId, Map<String, Object> fields);
 
     Page<Issue> findAll(Pageable pageable);
 
-    Page<Issue> findByName(String name, Long projectId, Pageable pageable);
+    Page<Issue> findByName(String name, Long projectId, Boolean incomplete, Pageable pageable);
 
     List<Issue> findByProjectId(Long projectId);
 
     Page<Issue> findByStatus(IssueStatus status, Long projectId, Pageable pageable);
 
-    Page<Issue> findByPriority(IssuePriority priority, Long projectId, Pageable pageable);
+    Page<Issue> findByPriority(IssuePriority priority, Long projectId, Boolean incomplete, Pageable pageable);
 
-    Page<Issue> findByType(IssueType type, Long projectId, Pageable pageable);
+    Page<Issue> findByType(IssueType type, Long projectId, Boolean incomplete, Pageable pageable);
 
-    Page<Issue> findByUserRole(IssueRoleType role, Long assignee, Long projectId, Pageable pageable);
+    Page<Issue> findByUserRole(IssueRoleType role, Long assignee, Long projectId, Boolean incomplete, Pageable pageable);
 
-    Page<Issue> findBeforeDueDate(LocalDate dueDate, Long projectId, Pageable pageable);
+    Page<Issue> findBeforeDueDate(LocalDate dueDate, Long projectId, Boolean incomplete, Pageable pageable);
 }
