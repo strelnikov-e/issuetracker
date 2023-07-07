@@ -80,4 +80,14 @@ public class ProjectRole {
     public void setRole(ProjectRoleType role) {
         this.role = role;
     }
+
+    @Override
+    public String toString() {
+        return "ProjectRole{" +
+                "id=" + id +
+                ", user=" + user +
+                ", project=" + project +
+                ", role=" + role +
+                '}';
+    }
 }

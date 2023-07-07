@@ -214,6 +214,7 @@ public class IssueServiceImpl implements IssueService {
 			issue.setName(requestIssue.getName());
 		}
 		issue.setDescription(requestIssue.getDescription());
+		issue.setReport(requestIssue.getReport());
 		issue.setParentIssue(requestIssue.getParentIssue());
 		issue.setStatus(requestIssue.getStatus());
 		issue.setType(requestIssue.getType());
@@ -243,6 +244,7 @@ public class IssueServiceImpl implements IssueService {
 			switch (k) {
 				case "name" -> issue.setName(v.toString());
 				case "description" -> issue.setDescription(v.toString());
+				case "report" -> issue.setReport(v.toString());
 				case "parentIssue" -> issue.setParentIssue((Long) v);
 				case "status" -> issue.setStatus(IssueStatus.valueOf(v.toString()));
 				case "type" -> issue.setType(IssueType.valueOf(v.toString()));

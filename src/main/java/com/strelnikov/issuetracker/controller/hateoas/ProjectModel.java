@@ -14,8 +14,8 @@ public class ProjectModel extends RepresentationModel<ProjectModel> {
     private String description;
     private LocalDate startDate;
     private String url;
-    private List<UserModel> managers;
     private List<UserModel> admins;
+    private List<UserModel> managers;
 
     public Long getId() {
         return id;

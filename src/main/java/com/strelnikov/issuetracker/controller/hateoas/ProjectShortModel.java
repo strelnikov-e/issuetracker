@@ -8,8 +8,8 @@ import java.time.LocalDate;
 public class ProjectShortModel extends RepresentationModel<ProjectShortModel> {
 
     private Long id;
-    private String name;
     private String key;
+    private String name;
     private String description;
     private LocalDate startDate;
     private String url;

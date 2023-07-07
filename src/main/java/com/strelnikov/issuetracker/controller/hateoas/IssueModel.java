@@ -11,14 +11,15 @@ public class IssueModel extends RepresentationModel<IssueModel> {
     private String key;
     private String name;
     private String description;
-    private Project project;
-    private Long parentIssue;
+    private String report;
     private IssueStatus status = IssueStatus.TODO;
     private IssueType type;
     private IssuePriority priority;
     private LocalDate startDate;
     private LocalDate dueDate;
     private LocalDate closeDate;
+    private Long parentIssue;
+    private Project project;
     private UserModel assignee;
     private UserModel reporter;
 
@@ -134,12 +135,21 @@ public class IssueModel extends RepresentationModel<IssueModel> {
         this.reporter = reporter;
     }
 
+    public String getReport() {
+        return report;
+    }
+
+    public void setReport(String report) {
+        this.report = report;
+    }
+
     public Issue convertToIssue() {
         Issue issue = new Issue();
         issue.setId(this.id);
         issue.setKey(this.key);
         issue.setName(this.name);
         issue.setDescription(this.description);
+        issue.setReport(this.getReport());
         issue.setProject(this.project);
         issue.setParentIssue(this.parentIssue);
         issue.setStatus(this.status);

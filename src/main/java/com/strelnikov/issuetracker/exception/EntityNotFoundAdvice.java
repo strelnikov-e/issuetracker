@@ -37,4 +37,11 @@ public class EntityNotFoundAdvice {
     String AccessForbiddenHandler(AccessForbiddenException exception) {
         return exception.getMessage();
     }
+
+    @ResponseBody
+    @ExceptionHandler(ProjectRoleNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    String RoleNotFoundException(ProjectRoleNotFoundException exception) {
+        return exception.getMessage();
+    }
 }

@@ -24,6 +24,7 @@ public class Issue {
 	private String name;
 
 	private String description;
+	private String report;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "project_id")
@@ -62,7 +63,7 @@ public class Issue {
 
 	public Issue(String name, Project project, String description, Long parentIssue,
 				 IssueStatus status, IssueType type, IssuePriority priority,
-				 LocalDate startDate, LocalDate dueDate, LocalDate closeDate, String key) {
+				 LocalDate startDate, LocalDate dueDate, LocalDate closeDate, String key, String report) {
 		this.name = name;
 		this.project = project;
 		this.description = description;
@@ -73,6 +74,7 @@ public class Issue {
 		this.startDate = startDate;
 		this.dueDate = dueDate;
 		this.closeDate = closeDate;
+		this.report = report;
 		generateKey(name);
 	}
 
@@ -231,5 +233,13 @@ public class Issue {
 
 	public void setTags(Set<Tag> tags) {
 		this.tags = tags;
+	}
+
+	public String getReport() {
+		return report;
+	}
+
+	public void setReport(String report) {
+		this.report = report;
 	}
 }

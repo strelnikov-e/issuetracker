@@ -40,7 +40,7 @@ public class ProjectRoleServiceImpl implements ProjectRoleService {
     @Override
     public ProjectRole getById(Long id) {
         return projectRoleRepository.findById(id)
-                .orElseThrow();
+                .orElseThrow(() -> new ProjectRoleNotFoundException(id));
     }
 
     @Override
@@ -70,13 +70,15 @@ public class ProjectRoleServiceImpl implements ProjectRoleService {
     public ProjectRole patch(Long id, Map<String, Object> fields) {
         ProjectRole projectRole = projectRoleRepository.findById(id)
                 .orElseThrow(() -> new ProjectRoleNotFoundException(id));
-        fields.forEach((k, v) -> {
+        fields.forEach((String k, Object v) -> {
             switch (k) {
                 case "user" -> projectRole.setUser(userService.findById(Long.parseLong(v.toString())));
                 case "project" -> projectRole.setProject(projectService.findById(Long.parseLong(v.toString())));
                 case "role" -> projectRole.setRole(ProjectRoleType.valueOf(v.toString()));
             }
         });
-    return projectRoleRepository.save(projectRole);
+        ProjectRole saved = projectRoleRepository.save(projectRole);
+        System.out.println("Role to save: " + projectRole + "\n" + "Saved role: " + saved);
+        return saved;
     }
 }

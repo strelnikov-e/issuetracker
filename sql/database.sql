@@ -44,6 +44,7 @@ create table `issues`
 `issue_key` varchar(24) not null,
 `name` varchar(128) not null,
 `description` text,
+`report` text,
 `project_id` bigint,
 `parent_issue` bigint default 0,
 `status` char(1) default 'O' not null,
