@@ -50,5 +50,10 @@ public interface UserRepository extends CrudRepository<User, Long> {
             """)
     Optional<User> findByIssueAndRole(Long issueId, IssueRoleType role);
 
-
+    @Query("""
+            SELECT user FROM User user
+            JOIN ProjectRole proj_role on user.id=proj_role.user.id
+            WHERE proj_role.project.id = :id and proj_role.role = :role
+            """)
+    Optional<User> findByProjectAndRole(Long id, ProjectRoleType role);
 }

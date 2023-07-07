@@ -3,6 +3,7 @@ package com.strelnikov.issuetracker.config;
 
 import com.strelnikov.issuetracker.entity.*;
 import com.strelnikov.issuetracker.exception.IssueNotFoundException;
+import com.strelnikov.issuetracker.exception.ProjectNotFoundException;
 import com.strelnikov.issuetracker.exception.UserNotFoundException;
 import com.strelnikov.issuetracker.repository.*;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,14 +22,16 @@ public class RoleService {
     private final UserRoleRepository userRoleRepository;
     private final UserRepository userRepository;
     private final IssueRepository issueRepository;
+    private final ProjectRepository projectRepository;
 
     public RoleService(ProjectRoleRepository projectRoleRepository,
-                       IssueRoleRepository issueRoleRepository, UserRoleRepository userRoleRepository, UserRepository userRepository, IssueRepository issueRepository) {
+                       IssueRoleRepository issueRoleRepository, UserRoleRepository userRoleRepository, UserRepository userRepository, IssueRepository issueRepository, ProjectRepository projectRepository) {
         this.projectRoleRepository = projectRoleRepository;
         this.issueRoleRepository = issueRoleRepository;
         this.userRoleRepository = userRoleRepository;
         this.userRepository = userRepository;
         this.issueRepository = issueRepository;
+        this.projectRepository = projectRepository;
     }
 
     @Transactional
@@ -119,10 +122,35 @@ public class RoleService {
 //        issueRoleRepository.save(entry);
     }
 
+    public void addProjectRole(Long userId, Long projectId, ProjectRoleType role) {
+        // fetch user by id
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+        // fetch project by id
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
+
+        // check if required entry in DB already persisted
+        if (projectRoleRepository.existsByUserIdAndProjectIdAndRole(userId, projectId, role)) {
+            return;
+        }
+
+        ProjectRole entry = new ProjectRole(user, project, role);
+        projectRoleRepository.save(entry);
+
+    }
+
+    @Transactional
+    public void deleteUserRoleForProject(Long projectId, ProjectRoleType role) {
+        projectRoleRepository.deleteByProjectIdAndRole(projectId, role);
+    }
+
     @Transactional
     public void deleteUserRoleForIssue(Long issueId, IssueRoleType role) {
         issueRoleRepository.deleteByIssueIdAndRole(issueId, role);
     }
+
+
 }
 
 

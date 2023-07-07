@@ -20,7 +20,7 @@ import java.time.LocalDate;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/issues")
 public class IssueRestController {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProjectRestController.class);
@@ -42,7 +42,7 @@ public class IssueRestController {
     /*
     Return list of the issues where current user any role.
      */
-    @GetMapping("/issues")
+    @GetMapping
     @PreAuthorize("isAuthenticated")
     public CollectionModel<IssueModel> all(@RequestParam Map<String, Object> params, Pageable pageable) {
 
@@ -85,7 +85,7 @@ public class IssueRestController {
     /*
     Return an issue if it exists and if User authorized to view the issue.
      */
-    @GetMapping("/issues/{issueId}")
+    @GetMapping("/{issueId}")
     @PreAuthorize("@RoleService.hasAnyRoleByIssueId(#issueId, @IssueRole.VIEWER)")
     public IssueModel getById(@PathVariable Long issueId) {
         Issue issue = issueService.findById(issueId);
@@ -98,10 +98,11 @@ public class IssueRestController {
     Return 403 if user is not have assigned any project role.
     Required fields: issue.name, project.id
      */
-    @PostMapping("/issues")
+    @PostMapping
     @PreAuthorize("@RoleService.hasAnyRoleByProjectId(#requestIssue.project.id, @ProjectRole.VIEWER)")
-    public ResponseEntity<?> createIssue(@RequestBody Issue requestIssue) {
+    public ResponseEntity<?> createIssue(@RequestBody IssueModel requestIssue) {
         LOG.debug("POST Request to create new issue: '{}'", requestIssue.toString());
+
         IssueModel entityModel = assembler.toModel(issueService.create(requestIssue));
         return ResponseEntity
                 .created(entityModel
@@ -115,7 +116,7 @@ public class IssueRestController {
     Method wil set fields to NULL (aside from id, name, project and key) if the field was not set in the request body.
     Return 403 if user is not have an ASSIGNEE ROLE or above.
      */
-    @PutMapping("/issues/{issueId}")
+    @PutMapping("/{issueId}")
     @PreAuthorize("@RoleService.hasAnyRoleByIssueId(#issueId, @IssueRole.ASSIGNEE)")
     public ResponseEntity<?> updateIssue(@PathVariable Long issueId, @RequestBody IssueModel requestIssue) {
         LOG.debug("PUT Request to update issue with ID: '{}'. New values: '{}'", issueId, requestIssue.toString());
@@ -130,7 +131,7 @@ public class IssueRestController {
     Method wil set fields to NULL (aside from id, name, project and key) if the field was not set in the request body.
     Return 403 if user is not have an ASSIGNEE ROLE or above.
      */
-    @PatchMapping("/issues/{issueId}")
+    @PatchMapping("/{issueId}")
     @PreAuthorize("@RoleService.hasAnyRoleByIssueId(#issueId, @IssueRole.ASSIGNEE)")
     public ResponseEntity<?> patchIssue(@PathVariable Long issueId, @RequestBody Map<String, Object> fields) {
         if (issueId.compareTo(0L) < 1 || fields == null || fields.isEmpty()) {
@@ -146,7 +147,7 @@ public class IssueRestController {
    Delete issue by ID passed as path variable.
    User should be a project MANAGER.
     */
-    @DeleteMapping("/issues/{issueId}")
+    @DeleteMapping("/{issueId}")
     public ResponseEntity<?> deleteIssue(@PathVariable Long issueId) {
         LOG.debug("Delete request for project with ID: '{}'", issueId);
         issueService.deleteById(issueId);

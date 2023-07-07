@@ -2,6 +2,7 @@ package com.strelnikov.issuetracker.service;
 
 
 import com.strelnikov.issuetracker.entity.IssueRoleType;
+import com.strelnikov.issuetracker.entity.ProjectRoleType;
 import com.strelnikov.issuetracker.entity.User;
 import com.strelnikov.issuetracker.exception.UserNotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,8 +33,13 @@ public interface UserService {
 
     User getUserDetails();
 
-    User findByIssueRole(Long issueId, IssueRoleType assignee);
-
     User patch(Map<String, Object> fields);
 
+    User findByIssueRole(Long issueId, IssueRoleType assignee);
+
+    User findByProjectRole(Long id, ProjectRoleType manager);
+
+    boolean existById(Long id);
+
+    User findById(Long id);
 }

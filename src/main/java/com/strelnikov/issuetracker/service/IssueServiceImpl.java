@@ -173,7 +173,8 @@ public class IssueServiceImpl implements IssueService {
 
 	@Override
 	@Transactional
-	public Issue create(Issue issue) {
+	public Issue create(IssueModel requestIssue) {
+		Issue issue = requestIssue.convertToIssue();
 		Project project = projectRepository.findById(issue.getProject().getId())
 				.orElseThrow(() -> new ProjectNotFoundException(issue.getProject().getId()));
 		issue.setId(0L);
@@ -193,6 +194,14 @@ public class IssueServiceImpl implements IssueService {
 		}
 		Issue savedIssue = issueRepository.save(issue);
 		userService.getCurrentUser().addIssueRole(savedIssue, IssueRoleType.REPORTER);
+		if (requestIssue.getAssignee() != null
+				&& requestIssue.getAssignee().getId() != null
+				&& !requestIssue.getAssignee().getId().equals(0L)) {
+			roleService.changeUserRoleForIssue(
+					requestIssue.getAssignee().getId(),
+					savedIssue.getId(),
+					IssueRoleType.ASSIGNEE);
+		}
 		return savedIssue;
 	}
 

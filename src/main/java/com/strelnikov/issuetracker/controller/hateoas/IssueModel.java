@@ -133,4 +133,22 @@ public class IssueModel extends RepresentationModel<IssueModel> {
     public void setReporter(UserModel reporter) {
         this.reporter = reporter;
     }
+
+    public Issue convertToIssue() {
+        Issue issue = new Issue();
+        issue.setId(this.id);
+        issue.setKey(this.key);
+        issue.setName(this.name);
+        issue.setDescription(this.description);
+        issue.setProject(this.project);
+        issue.setParentIssue(this.parentIssue);
+        issue.setStatus(this.status);
+        issue.setType(this.type);
+        issue.setPriority(this.priority);
+        issue.setStartDate(this.startDate);
+        issue.setDueDate(this.dueDate);
+        issue.setCloseDate(this.closeDate);
+
+        return issue;
+    }
 }

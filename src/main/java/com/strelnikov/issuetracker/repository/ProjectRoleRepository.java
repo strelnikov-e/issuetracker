@@ -6,6 +6,7 @@ import com.strelnikov.issuetracker.entity.ProjectRoleType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Set;
 
 public interface ProjectRoleRepository extends JpaRepository<ProjectRole, Long> {
@@ -24,4 +25,16 @@ public interface ProjectRoleRepository extends JpaRepository<ProjectRole, Long> 
     Set<ProjectRoleType> findRoleTypesByUserIdAndIssueId(Long userId, Long issueId);
 
     void deleteAllByProjectId(Long projectId);
+
+    void deleteByProjectIdAndRole(Long projectId, ProjectRoleType role);
+
+    List<ProjectRole> findByProjectIdAndRole(Long projectId, ProjectRoleType role);
+
+    List<ProjectRole> findAllByUserId(Long id);
+
+    List<ProjectRole> findAllByProjectId(Long projectId);
+
+    ProjectRole findByUserIdAndProjectIdAndRole(Long id, Long id1, ProjectRoleType role);
+
+    boolean existsByUserIdAndProjectIdAndRole(Long id, Long id1, ProjectRoleType role);
 }

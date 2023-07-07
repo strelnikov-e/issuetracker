@@ -82,6 +82,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public User findByProjectRole(Long id, ProjectRoleType role) {
+		return userRepository.findByProjectAndRole(id, role).orElseGet(User::new);
+	}
+
+	@Override
 	public User findByEmail(String email) {
 		User user = userRepository.findByEmail(email)
 				.orElseThrow(() -> new UserNotFoundException());
@@ -93,7 +98,7 @@ public class UserServiceImpl implements UserService {
 		if (userRepository.existsByEmail(requestUser.getEmail())) {
 			throw new UserAlreadyExistsException(requestUser.getEmail());
 		}
-		final String encodedPwd = "{bcrypt}" + passwordEncoder.encode(requestUser.getPassword());
+		final String encodedPwd = passwordEncoder.encode(requestUser.getPassword());
 		requestUser.setPassword(encodedPwd);
 		System.out.println(requestUser.getPassword());
 		return userRepository.save(requestUser);
@@ -167,5 +172,15 @@ public class UserServiceImpl implements UserService {
 				.filter(role -> role.getRole() != ProjectRoleType.VIEWER)
 				.map(role -> role.getProject().getId())
 				.collect(Collectors.toSet());
+	}
+
+	@Override
+	public boolean existById(Long id) {
+		return userRepository.existsById(id);
+	}
+
+	@Override
+	public User findById(Long id) {
+		return userRepository.findById(id).orElseThrow(UserNotFoundException::new);
 	}
 }

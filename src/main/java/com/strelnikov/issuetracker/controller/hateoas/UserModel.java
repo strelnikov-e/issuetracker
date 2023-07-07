@@ -8,6 +8,7 @@ public class UserModel extends RepresentationModel<UserModel> {
     private Long id;
     private String firstName;
     private String lastName;
+    private String email;
     private String companyName;
     private Project currentProject;
 
@@ -33,6 +34,14 @@ public class UserModel extends RepresentationModel<UserModel> {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getCompanyName() {

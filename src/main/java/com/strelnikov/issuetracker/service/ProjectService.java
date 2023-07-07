@@ -1,6 +1,7 @@
 package com.strelnikov.issuetracker.service;
 
 
+import com.strelnikov.issuetracker.controller.hateoas.ProjectModel;
 import com.strelnikov.issuetracker.entity.Project;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,10 +14,11 @@ public interface ProjectService {
 
     Project findById(Long id);
 
-    Project update(Project project);
+    Project update(ProjectModel project);
 
     void deleteById(Long projectId);
 
-    Project create(Project project);
+    Project create(ProjectModel project);
 
+    boolean existById(Long id);
 }

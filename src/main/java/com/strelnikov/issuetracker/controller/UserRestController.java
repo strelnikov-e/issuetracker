@@ -71,14 +71,11 @@ public class UserRestController {
     Open endpoint.
     Required fields: username, password, email, firstName, lastName
      */
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody User requestUser) {
+    public UserModel create(@RequestBody User requestUser) {
         UserModel entityModel = assembler.toModel(userService.save(requestUser));
-        return ResponseEntity
-                .created(entityModel
-                        .getRequiredLink(IanaLinkRelations.SELF)
-                        .toUri())
-                .body(entityModel);
+        return entityModel;
     }
 
     /*

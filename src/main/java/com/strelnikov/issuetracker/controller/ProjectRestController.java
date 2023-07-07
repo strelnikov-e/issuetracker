@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/projects")
 public class ProjectRestController {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProjectRestController.class);
@@ -38,7 +38,7 @@ public class ProjectRestController {
     /*
     Return list of the projects where current user any role.
     */
-    @GetMapping("/projects")
+    @GetMapping
     public CollectionModel<ProjectModel> all(@RequestParam Map<String, Object> params, Pageable pageable) {
 
         Page<Project> projects;
@@ -55,7 +55,7 @@ public class ProjectRestController {
     /*
     Return project by ID if authenticated user has any role in requested project.
      */
-    @GetMapping("/projects/{projectId}")
+    @GetMapping("/{projectId}")
     @PreAuthorize("@RoleService.hasAnyRoleByProjectId(#projectId, @ProjectRole.VIEWER)")
     public ProjectModel getById(@PathVariable Long projectId) {
         Project project = projectService.findById(projectId);
@@ -69,8 +69,8 @@ public class ProjectRestController {
     Create a new project. Request should contain name of the project.
     User will get an ADMIN role for the project.
      */
-    @PostMapping("/projects")
-    public ResponseEntity<?> createProject(@Valid @RequestBody Project project) {
+    @PostMapping
+    public ResponseEntity<?> createProject(@Valid @RequestBody ProjectModel project) {
         LOG.debug("POST request to create project: '{}'", project);
         ProjectModel entityModel = assembler.toModel(projectService.create(project));
         return ResponseEntity
@@ -82,9 +82,9 @@ public class ProjectRestController {
     Update project by ID passed as path variable.
     User should have role of MANAGER or above for the project.
      */
-    @PutMapping("/projects/{projectId}")
+    @PutMapping("/{projectId}")
     @PreAuthorize("@RoleService.hasAnyRoleByProjectId(#projectId, @ProjectRole.MANAGER)")
-    public ResponseEntity<?> updateProject(@PathVariable Long projectId, @RequestBody Project project) {
+    public ResponseEntity<?> updateProject(@PathVariable Long projectId, @RequestBody ProjectModel project) {
         LOG.debug("PUT Request to update project with ID: '{}'. New values: '{}'", projectId, project.toString());
         project.setId(projectId);
         ProjectModel entityModel = assembler.toModel(projectService.update(project));
@@ -97,7 +97,7 @@ public class ProjectRestController {
     Delete project by ID passed as path variable.
     User should have role of ADMIN for the project.
      */
-    @DeleteMapping("/projects/{projectId}")
+    @DeleteMapping("/{projectId}")
     @PreAuthorize("@RoleService.hasAnyRoleByProjectId(#projectId, @ProjectRole.ADMIN)")
     public ResponseEntity<?> deleteProject(@PathVariable Long projectId) {
         LOG.debug("Delete request for project with ID: '{}'", projectId);

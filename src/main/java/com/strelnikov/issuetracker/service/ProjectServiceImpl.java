@@ -1,9 +1,9 @@
 package com.strelnikov.issuetracker.service;
 
-import com.strelnikov.issuetracker.entity.Issue;
-import com.strelnikov.issuetracker.entity.Project;
-import com.strelnikov.issuetracker.entity.ProjectRoleType;
-import com.strelnikov.issuetracker.entity.User;
+import com.strelnikov.issuetracker.config.RoleService;
+import com.strelnikov.issuetracker.controller.hateoas.ProjectModel;
+import com.strelnikov.issuetracker.controller.hateoas.UserModel;
+import com.strelnikov.issuetracker.entity.*;
 import com.strelnikov.issuetracker.exception.ProjectNotFoundException;
 import com.strelnikov.issuetracker.repository.ProjectRepository;
 import com.strelnikov.issuetracker.repository.ProjectRoleRepository;
@@ -23,17 +23,19 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectRoleRepository projectRoleRepository;
     private final IssueService issueService;
     private final UserService userService;
+    private final RoleService roleService;
 
     public ProjectServiceImpl(
             ProjectRepository projectRepository,
             IssueService issueService,
             UserService userService,
-            ProjectRoleRepository projectRoleRepository) {
+            ProjectRoleRepository projectRoleRepository, RoleService roleService) {
 
         this.projectRepository = projectRepository;
         this.issueService = issueService;
         this.userService = userService;
         this.projectRoleRepository = projectRoleRepository;
+        this.roleService = roleService;
     }
 
     private User getCurrentUser() {
@@ -63,21 +65,44 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    public Project create(Project project) {
-        project.setId(0L);
-        System.out.println(project);
+    public Project create(ProjectModel requestProject) {
+        // protect against project update
+        requestProject.setId(0L);
+        // cast Model to project
+        Project project = requestProject.convertToProject();
+        // generate new project key if it is not provided in request body
         if (project.getKey() == null || project.getKey().isEmpty() || project.getKey().equals("null")) {
             System.out.println("key is null " + project.getKey());
             project.setKey(project.generateKey(project.getName()));
         }
+        // save project to DB
         Project savedProject = projectRepository.save(project);
+        // assign managers to created project
         getCurrentUser().addProjectRole(savedProject, ProjectRoleType.ADMIN);
+        if (requestProject.getManagers() != null && !requestProject.getManagers().isEmpty()) {
+            // iterate through list of managers provided in the request body and save roles to ProjectRole table
+            for (UserModel manager : requestProject.getManagers()) {
+                if (manager.getId() != null && !manager.getId().equals(0L)) {
+                    projectRoleRepository.save(new ProjectRole(
+                            userService.findById(manager.getId()),
+                            savedProject,
+                            ProjectRoleType.MANAGER
+                    ));
+                }
+            }
+        }
         return savedProject;
     }
 
     @Override
     @Transactional
-    public Project update(Project project) {
+    public Project update(ProjectModel requestProject) {
+        Project project = projectRepository.findById(requestProject.getId())
+                .orElseThrow(() -> new ProjectNotFoundException(requestProject.getId()));
+        project.setName(requestProject.getName());
+        project.setStartDate(requestProject.getStartDate());
+        project.setUrl(requestProject.getUrl());
+
         return projectRepository.save(project);
     }
 
@@ -93,5 +118,10 @@ public class ProjectServiceImpl implements ProjectService {
         }
         projectRoleRepository.deleteAllByProjectId(projectId);
         projectRepository.deleteById(projectId);
+    }
+
+    @Override
+    public boolean existById(Long id) {
+        return projectRepository.existsById(id);
     }
 }

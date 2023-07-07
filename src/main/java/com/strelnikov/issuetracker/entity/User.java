@@ -27,8 +27,7 @@ public class User {
     @JsonIgnore
     private List<IssueRole> issueRoles = new ArrayList<>();
 
-    @Column(columnDefinition = "char")
-    @JsonIgnore
+    @Column(columnDefinition = "char(68)")
     private String password;
 
     private boolean enabled = true;
