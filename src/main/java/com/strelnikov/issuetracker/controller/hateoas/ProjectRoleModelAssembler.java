@@ -11,10 +11,10 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Component
 public class ProjectRoleModelAssembler extends RepresentationModelAssemblerSupport<ProjectRole, ProjectRoleModel> {
 
-    private final UserModelAssembler userModelAssembler;
-    private final ProjectModelAssembler projectModelAssembler;
+    private final UserShortModelAssembler userModelAssembler;
+    private final ProjectShortModelAssembler projectModelAssembler;
 
-    public ProjectRoleModelAssembler(UserModelAssembler userModelAssembler, ProjectModelAssembler projectModelAssembler) {
+    public ProjectRoleModelAssembler(UserShortModelAssembler userModelAssembler, ProjectShortModelAssembler projectModelAssembler) {
         super(UserRoleRestController.class, ProjectRoleModel.class);
         this.userModelAssembler = userModelAssembler;
         this.projectModelAssembler = projectModelAssembler;

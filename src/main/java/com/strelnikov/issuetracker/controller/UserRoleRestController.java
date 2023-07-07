@@ -4,6 +4,7 @@ import com.strelnikov.issuetracker.controller.hateoas.ProjectRoleModel;
 import com.strelnikov.issuetracker.controller.hateoas.ProjectRoleModelAssembler;
 import com.strelnikov.issuetracker.entity.ProjectRole;
 import com.strelnikov.issuetracker.service.ProjectRoleService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
@@ -11,12 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api/roles")
@@ -34,16 +30,12 @@ public class UserRoleRestController {
 
     @GetMapping("/project")
     public CollectionModel<ProjectRoleModel> all(@RequestParam Map<String, String> params, Pageable pageable) {
-        List<ProjectRoleModel> projectRoleModels;
+        Page<ProjectRole> projectRoleModels;
         Long projectId = Long.parseLong(params.getOrDefault("project", "0"));
-        projectRoleModels = projectRoleService.getAllByProjectId(projectId)
-                .stream()
-                .map(assembler::toModel)
-                .collect(Collectors.toList());
+        projectRoleModels = projectRoleService.getAllByProjectId(projectId, pageable);
 
 //        return projectRoleModels;
-        return CollectionModel.of(projectRoleModels)
-                .add( linkTo(methodOn(UserRoleRestController.class).all(params, pageable)).withSelfRel());
+        return pagedResourcesAssembler.toModel(projectRoleModels, assembler);
     }
 
     @GetMapping("/{id}")

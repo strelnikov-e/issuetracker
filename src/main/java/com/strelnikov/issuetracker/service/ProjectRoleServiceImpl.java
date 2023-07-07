@@ -7,6 +7,8 @@ import com.strelnikov.issuetracker.entity.ProjectRoleType;
 import com.strelnikov.issuetracker.entity.User;
 import com.strelnikov.issuetracker.exception.ProjectRoleNotFoundException;
 import com.strelnikov.issuetracker.repository.ProjectRoleRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,13 +28,13 @@ public class ProjectRoleServiceImpl implements ProjectRoleService {
     }
 
     @Override
-    public List<ProjectRole> getAllByProjectId(Long projectId) {
+    public Page<ProjectRole> getAllByProjectId(Long projectId, Pageable pageable) {
 
         if (projectId.equals(0L)) {
             User user = userService.getCurrentUser();
-            return projectRoleRepository.findAllByUserId(user.getId());
+            return projectRoleRepository.findAllByUserId(user.getId(), pageable);
         }
-        return projectRoleRepository.findAllByProjectId(projectId);
+        return projectRoleRepository.findAllByProjectId(projectId, pageable);
     }
 
     @Override

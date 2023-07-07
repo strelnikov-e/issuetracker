@@ -3,6 +3,8 @@ package com.strelnikov.issuetracker.repository;
 
 import com.strelnikov.issuetracker.entity.ProjectRole;
 import com.strelnikov.issuetracker.entity.ProjectRoleType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -30,9 +32,9 @@ public interface ProjectRoleRepository extends JpaRepository<ProjectRole, Long> 
 
     List<ProjectRole> findByProjectIdAndRole(Long projectId, ProjectRoleType role);
 
-    List<ProjectRole> findAllByUserId(Long id);
+    Page<ProjectRole> findAllByUserId(Long id, Pageable pageable);
 
-    List<ProjectRole> findAllByProjectId(Long projectId);
+    Page<ProjectRole> findAllByProjectId(Long projectId, Pageable pageable);
 
     ProjectRole findByUserIdAndProjectIdAndRole(Long id, Long id1, ProjectRoleType role);
 

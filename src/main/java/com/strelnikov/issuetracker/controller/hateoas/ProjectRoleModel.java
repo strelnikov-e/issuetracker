@@ -6,8 +6,8 @@ import org.springframework.hateoas.RepresentationModel;
 public class ProjectRoleModel extends RepresentationModel<ProjectRoleModel> {
 
     private Long id;
-    private UserModel user;
-    private ProjectModel project;
+    private UserShortModel user;
+    private ProjectShortModel project;
     private ProjectRoleType role;
 
     public Long getId() {
@@ -18,19 +18,19 @@ public class ProjectRoleModel extends RepresentationModel<ProjectRoleModel> {
         this.id = id;
     }
 
-    public UserModel getUser() {
+    public UserShortModel getUser() {
         return user;
     }
 
-    public void setUser(UserModel user) {
+    public void setUser(UserShortModel user) {
         this.user = user;
     }
 
-    public ProjectModel getProject() {
+    public ProjectShortModel getProject() {
         return project;
     }
 
-    public void setProject(ProjectModel project) {
+    public void setProject(ProjectShortModel project) {
         this.project = project;
     }
 
