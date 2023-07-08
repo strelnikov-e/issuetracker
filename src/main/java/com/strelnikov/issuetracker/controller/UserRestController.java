@@ -60,6 +60,13 @@ public class UserRestController {
                 .add( linkTo(methodOn(UserRestController.class).all(params, pageable)).withSelfRel());
     }
 
+    @GetMapping("/email")
+    public UserModel findByEmail(@RequestParam String email) {
+        User user = userService.findByEmail(email);
+
+        return assembler.toModel(user);
+    }
+
     @GetMapping("/details")
     public UserModel userDetails() {
         User user = userService.getCurrentUser();

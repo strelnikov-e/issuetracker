@@ -58,6 +58,27 @@ CONSTRAINT `FK_issues_project_id` FOREIGN KEY (`project_id`) REFERENCES `project
 ) 
 ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
+DROP TABLE IF EXISTS `teams`;
+
+create table `teams` 
+(
+`id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+`name` varchar(128)
+) 
+ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `users_teams`;
+
+CREATE TABLE `users_teams` 
+(
+  `team_id` bigint NOT NULL,
+  `user_id` bigint NOT NULL,
+  PRIMARY KEY (`team_id`),
+  CONSTRAINT `FK__users_teams` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `FK_teams_users` FOREIGN KEY (`team_id`) REFERENCES `teams` (`id`) 
+)
+ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 DROP TABLE IF EXISTS `users_roles`;
 
 create table `users_roles` 
