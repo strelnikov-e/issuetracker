@@ -39,5 +39,8 @@ public interface IssueService {
 
     Page<Issue> findByUserRole(IssueRoleType role, Long assignee, Long projectId, Boolean incomplete, Pageable pageable);
 
+    List<Issue> findByUserRole(IssueRoleType role, Long projectId);
+
     Page<Issue> findBeforeDueDate(LocalDate dueDate, Long projectId, Boolean incomplete, Pageable pageable);
+
 }

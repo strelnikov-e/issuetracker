@@ -39,4 +39,6 @@ public interface ProjectRoleRepository extends JpaRepository<ProjectRole, Long> 
     ProjectRole findByUserIdAndProjectIdAndRole(Long id, Long id1, ProjectRoleType role);
 
     boolean existsByUserIdAndProjectIdAndRole(Long id, Long id1, ProjectRoleType role);
+
+    boolean existsByUserIdAndProjectId(Long id, Long id1);
 }

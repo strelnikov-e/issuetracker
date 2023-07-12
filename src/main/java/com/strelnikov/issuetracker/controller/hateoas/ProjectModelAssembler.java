@@ -1,10 +1,10 @@
 package com.strelnikov.issuetracker.controller.hateoas;
 
+import com.strelnikov.issuetracker.config.RoleService;
 import com.strelnikov.issuetracker.controller.ProjectRestController;
 import com.strelnikov.issuetracker.entity.Project;
 import com.strelnikov.issuetracker.entity.ProjectRoleType;
 import com.strelnikov.issuetracker.service.ProjectRoleService;
-import com.strelnikov.issuetracker.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.stereotype.Component;
@@ -18,13 +18,14 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Component
 public class ProjectModelAssembler extends RepresentationModelAssemblerSupport<Project, ProjectModel> {
 
-    private final UserService userService;
+    private final RoleService roleService;
     private final ProjectRoleService projectRoleService;
     private final UserModelAssembler assembler;
 
-    public ProjectModelAssembler(UserService userService, ProjectRoleService projectRoleService, UserModelAssembler assembler) {
+
+    public ProjectModelAssembler(RoleService roleService, ProjectRoleService projectRoleService, UserModelAssembler assembler) {
         super(ProjectRestController.class, ProjectModel.class);
-        this.userService = userService;
+        this.roleService = roleService;
         this.projectRoleService = projectRoleService;
         this.assembler = assembler;
     }
@@ -36,6 +37,14 @@ public class ProjectModelAssembler extends RepresentationModelAssemblerSupport<P
                 methodOn(ProjectRestController.class)
                         .getById(entity.getId()))
                 .withSelfRel());
+        if (roleService.hasAnyRoleByProjectId(entity.getId(), ProjectRoleType.ADMIN)) {
+            model.add(linkTo(methodOn(ProjectRestController.class)
+                    .deleteProject( entity.getId())).withRel("delete"));
+        }
+        if (roleService.hasAnyRoleByProjectId(entity.getId(), ProjectRoleType.MANAGER)) {
+            model.add(linkTo(methodOn(ProjectRestController.class)
+                    .updateProject(entity.getId(), new ProjectModel())).withRel("update"));
+        }
         BeanUtils.copyProperties(entity, model);
         List<UserModel> managers = projectRoleService.findByProjectIdAndRole(entity.getId(), ProjectRoleType.MANAGER)
                 .stream()

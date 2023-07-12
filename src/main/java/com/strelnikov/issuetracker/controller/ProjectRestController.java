@@ -3,7 +3,7 @@ package com.strelnikov.issuetracker.controller;
 import com.strelnikov.issuetracker.controller.hateoas.ProjectModel;
 import com.strelnikov.issuetracker.controller.hateoas.ProjectModelAssembler;
 import com.strelnikov.issuetracker.entity.Project;
-import com.strelnikov.issuetracker.exception.ProjectNotFoundException;
+import com.strelnikov.issuetracker.exception.exception.ProjectNotFoundException;
 import com.strelnikov.issuetracker.service.ProjectService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;

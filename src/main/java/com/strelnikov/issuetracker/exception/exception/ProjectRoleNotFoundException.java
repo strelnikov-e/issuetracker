@@ -1,4 +1,4 @@
-package com.strelnikov.issuetracker.exception;
+package com.strelnikov.issuetracker.exception.exception;
 
 public class ProjectRoleNotFoundException extends RuntimeException {
 

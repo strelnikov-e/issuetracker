@@ -157,7 +157,7 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
     @Query("""
             SELECT issue from Issue issue
             JOIN IssueRole issue_role ON issue.id = issue_role.issue.id
-            WHERE issue_role.role = :role 
+            WHERE issue_role.role = :role
             AND issue_role.user.id = :assignee 
             AND issue.project.id = :projectId
             AND issue.status <> :status
@@ -184,6 +184,17 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
 
     Page<Issue> findByProjectIdAndDueDateLessThanAndStatusNot(Long projectId, LocalDate dueDate, IssueStatus status, Pageable pageable);
 
+    @Query("""
+            SELECT issue from Issue issue
+            JOIN IssueRole issue_role ON issue.id = issue_role.issue.id
+            WHERE issue_role.role = :role AND issue_role.user.id = :id
+            """)
+    List<Issue> findByRoleAndUserId(IssueRoleType role, Long id);
 
-
+    @Query("""
+            SELECT issue from Issue issue
+            JOIN IssueRole issue_role ON issue.id = issue_role.issue.id
+            WHERE issue_role.role = :role AND issue_role.user.id = :id AND issue.project.id = :projectId
+            """)
+    List<Issue> findByProjectIdAndRoleAndUserId(IssueRoleType role, Long id, Long projectId);
 }

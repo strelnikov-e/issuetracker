@@ -3,8 +3,10 @@ package com.strelnikov.issuetracker.controller;
 import com.strelnikov.issuetracker.config.RoleService;
 import com.strelnikov.issuetracker.controller.hateoas.IssueModel;
 import com.strelnikov.issuetracker.controller.hateoas.IssueModelAssembler;
+import com.strelnikov.issuetracker.controller.hateoas.IssueStatusModelAssembler;
 import com.strelnikov.issuetracker.entity.*;
 import com.strelnikov.issuetracker.service.IssueService;
+import com.strelnikov.issuetracker.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -26,13 +28,15 @@ public class IssueRestController {
     private static final Logger LOG = LoggerFactory.getLogger(ProjectRestController.class);
 
     private final RoleService roleService;
+    private final UserService userService;
     private final IssueService issueService;
     private final IssueModelAssembler assembler;
     private final IssueStatusModelAssembler issueStatusModelAssembler;
     private final PagedResourcesAssembler<Issue> pagedResourcesAssembler;
 
-    public IssueRestController(RoleService roleService, IssueService issueService, IssueModelAssembler assembler, IssueStatusModelAssembler issueStatusModelAssembler, PagedResourcesAssembler<Issue> pagedResourcesAssembler) {
+    public IssueRestController(RoleService roleService, UserService userService, IssueService issueService, IssueModelAssembler assembler, IssueStatusModelAssembler issueStatusModelAssembler, PagedResourcesAssembler<Issue> pagedResourcesAssembler) {
         this.roleService = roleService;
+        this.userService = userService;
         this.issueService = issueService;
         this.assembler = assembler;
         this.issueStatusModelAssembler = issueStatusModelAssembler;
@@ -81,6 +85,48 @@ public class IssueRestController {
         }
         return pagedResourcesAssembler.toModel(issues, assembler);
     }
+
+    @GetMapping("/assignee/{assigneeId}")
+    public CollectionModel<IssueModel> getForAssignee(@PathVariable Long assigneeId, @RequestParam Map<String, Object> params, Pageable pageable) {
+
+        Page<Issue> issues;
+        Long projectId = Long.parseLong(params.getOrDefault("project", 0L).toString());
+        Boolean incomplete = params.containsKey("incomplete");
+
+        if (!projectId.equals(0L) && !roleService.hasAnyRoleByProjectId(projectId, ProjectRoleType.VIEWER)) {
+            // check if current user has right to see issues of the project
+            // if query doesn't specify -> return issues for all project available for user by his role
+            issues = Page.empty();
+        } else {
+            issues = issueService
+                    .findByUserRole(IssueRoleType.ASSIGNEE, assigneeId, projectId, incomplete, pageable);
+        }
+        return pagedResourcesAssembler.toModel(issues, assembler);
+    }
+
+    @GetMapping("/mywork")
+    public CollectionModel<IssueModel> getMyWork(@RequestParam Map<String, Object> params, Pageable pageable) {
+        Long userId = userService.getCurrentUser().getId();
+        Page<Issue> issues;
+        Long projectId = Long.parseLong(params.getOrDefault("project", 0L).toString());
+        Boolean incomplete = params.containsKey("incomplete");
+
+        if (!projectId.equals(0L) && !roleService.hasAnyRoleByProjectId(projectId, ProjectRoleType.VIEWER)) {
+            // check if current user has right to see issues of the project
+            // if query doesn't specify -> return issues for all project available for user by his role
+            issues = Page.empty();
+        } else if (roleService.hasAnyRoleByProjectId(projectId, ProjectRoleType.MANAGER)) {
+            issues = issueService
+                    .findByProjectId(projectId,incomplete, pageable);
+
+        } else {
+            issues = issueService
+                    .findByUserRole(IssueRoleType.ASSIGNEE, userId, projectId, incomplete, pageable );
+        }
+
+        return pagedResourcesAssembler.toModel(issues, assembler);
+    }
+
 
     /*
     Return an issue if it exists and if User authorized to view the issue.

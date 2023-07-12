@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static jakarta.persistence.CascadeType.PERSIST;
+import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
@@ -21,11 +21,11 @@ public class User {
 
     private String email;
 
-    @OneToMany(fetch = LAZY, mappedBy = "user", cascade = PERSIST)
+    @OneToMany(fetch = LAZY, mappedBy = "user", cascade = ALL)
     @JsonIgnore
     private List<ProjectRole> projectRoles = new ArrayList<>();
 
-    @OneToMany(fetch = LAZY, mappedBy = "user", cascade = PERSIST)
+    @OneToMany(fetch = LAZY, mappedBy = "user", cascade = ALL)
     @JsonIgnore
     private List<IssueRole> issueRoles = new ArrayList<>();
 

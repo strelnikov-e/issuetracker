@@ -1,12 +1,10 @@
 package com.strelnikov.issuetracker.service;
 
-import com.strelnikov.issuetracker.entity.IssueRoleType;
-import com.strelnikov.issuetracker.entity.ProjectRoleType;
-import com.strelnikov.issuetracker.entity.User;
-import com.strelnikov.issuetracker.exception.CannotProcessRequest;
-import com.strelnikov.issuetracker.exception.ProjectNotFoundException;
-import com.strelnikov.issuetracker.exception.UserAlreadyExistsException;
-import com.strelnikov.issuetracker.exception.UserNotFoundException;
+import com.strelnikov.issuetracker.entity.*;
+import com.strelnikov.issuetracker.exception.exception.CannotProcessRequest;
+import com.strelnikov.issuetracker.exception.exception.ProjectNotFoundException;
+import com.strelnikov.issuetracker.exception.exception.UserAlreadyExistsException;
+import com.strelnikov.issuetracker.exception.exception.UserNotFoundException;
 import com.strelnikov.issuetracker.repository.ProjectRepository;
 import com.strelnikov.issuetracker.repository.UserRepository;
 import com.strelnikov.issuetracker.repository.UserRoleRepository;
@@ -18,10 +16,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -119,6 +114,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public User updateForce(User user) {
+		return userRepository.save(user);
+	}
+
+	@Override
 	public User patch(Map<String, Object> fields) {
 		User user = userRepository.findById(getCurrentUser().getId())
 				.orElseThrow(UserNotFoundException::new);
@@ -182,5 +182,23 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User findById(Long id) {
 		return userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+	}
+
+	@Override
+	@Transactional
+	public void deleteCurrentProject(Long projectId) {
+		if (userRepository.existsByCurrentProjectId(projectId)) {
+			User user = userRepository.findByCurrentProjectId(projectId);
+			Project project = new Project();
+			project.setId(0L);
+			project.setName("");
+
+			userRepository.updateCurrentProjectIdForUserId(project, user.getId());
+//			user.setCurrentProject(project);
+//			userRepository.save(user);
+		}
+
+
+
 	}
 }

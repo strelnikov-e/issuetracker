@@ -2,9 +2,9 @@ package com.strelnikov.issuetracker.config;
 
 
 import com.strelnikov.issuetracker.entity.*;
-import com.strelnikov.issuetracker.exception.IssueNotFoundException;
-import com.strelnikov.issuetracker.exception.ProjectNotFoundException;
-import com.strelnikov.issuetracker.exception.UserNotFoundException;
+import com.strelnikov.issuetracker.exception.exception.IssueNotFoundException;
+import com.strelnikov.issuetracker.exception.exception.ProjectNotFoundException;
+import com.strelnikov.issuetracker.exception.exception.UserNotFoundException;
 import com.strelnikov.issuetracker.repository.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

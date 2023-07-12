@@ -2,8 +2,8 @@ package com.strelnikov.issuetracker.service;
 
 import com.strelnikov.issuetracker.entity.Issue;
 import com.strelnikov.issuetracker.entity.Tag;
-import com.strelnikov.issuetracker.exception.IssueNotFoundException;
-import com.strelnikov.issuetracker.exception.TagNotFoundException;
+import com.strelnikov.issuetracker.exception.exception.IssueNotFoundException;
+import com.strelnikov.issuetracker.exception.exception.TagNotFoundException;
 import com.strelnikov.issuetracker.repository.IssueRepository;
 import com.strelnikov.issuetracker.repository.TagRepository;
 import org.springframework.data.domain.Page;

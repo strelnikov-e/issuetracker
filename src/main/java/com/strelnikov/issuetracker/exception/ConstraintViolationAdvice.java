@@ -1,6 +1,7 @@
 package com.strelnikov.issuetracker.exception;
 
 
+import com.strelnikov.issuetracker.exception.exception.CannotProcessRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;

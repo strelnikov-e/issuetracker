@@ -15,8 +15,8 @@ create table `users`
 `last_name` varchar(50) not null,
 `company_name` varchar(50),
 `current_project` bigint,
-PRIMARY KEY (`id`),
-CONSTRAINT `FK_users_project_id` FOREIGN KEY (`current_project`) REFERENCES `projects`(`id`)
+PRIMARY KEY (`id`)
+-- CONSTRAINT `FK_users_project_id` FOREIGN KEY (`current_project`) REFERENCES `projects`(`id`)
 ) 
 ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 

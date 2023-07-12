@@ -4,7 +4,7 @@ import com.strelnikov.issuetracker.controller.hateoas.TagModel;
 import com.strelnikov.issuetracker.controller.hateoas.TagModelAssembler;
 import com.strelnikov.issuetracker.entity.Issue;
 import com.strelnikov.issuetracker.entity.Tag;
-import com.strelnikov.issuetracker.exception.IssueNotFoundException;
+import com.strelnikov.issuetracker.exception.exception.IssueNotFoundException;
 import com.strelnikov.issuetracker.service.IssueService;
 import com.strelnikov.issuetracker.service.TagService;
 import org.slf4j.Logger;

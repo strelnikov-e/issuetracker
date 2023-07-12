@@ -1,11 +1,13 @@
 package com.strelnikov.issuetracker.repository;
 
 import com.strelnikov.issuetracker.entity.IssueRoleType;
+import com.strelnikov.issuetracker.entity.Project;
 import com.strelnikov.issuetracker.entity.ProjectRoleType;
 import com.strelnikov.issuetracker.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -56,4 +58,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE proj_role.project.id = :id and proj_role.role = :role
             """)
     Optional<User> findByProjectAndRole(Long id, ProjectRoleType role);
+
+    User findByCurrentProjectId(Long projectId);
+
+    boolean existsByCurrentProjectId(Long projectId);
+
+    @Modifying
+    @Query("""
+            UPDATE User user
+            SET user.currentProject=:project
+            WHERE user.id=:id
+            """)
+    void updateCurrentProjectIdForUserId(Project project, Long id);
 }

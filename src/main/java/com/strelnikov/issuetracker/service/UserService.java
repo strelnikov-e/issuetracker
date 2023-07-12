@@ -4,7 +4,7 @@ package com.strelnikov.issuetracker.service;
 import com.strelnikov.issuetracker.entity.IssueRoleType;
 import com.strelnikov.issuetracker.entity.ProjectRoleType;
 import com.strelnikov.issuetracker.entity.User;
-import com.strelnikov.issuetracker.exception.UserNotFoundException;
+import com.strelnikov.issuetracker.exception.exception.UserNotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
@@ -29,6 +29,8 @@ public interface UserService {
 
     User update(Long id, User user);
 
+    User updateForce(User user);
+
     void delete();
 
     User getUserDetails();
@@ -42,4 +44,6 @@ public interface UserService {
     boolean existById(Long id);
 
     User findById(Long id);
+
+    void deleteCurrentProject(Long projectId);
 }

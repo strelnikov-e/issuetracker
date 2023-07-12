@@ -22,7 +22,7 @@ public class ProjectRole {
     private Project project;
 
     @Enumerated(EnumType.STRING)
-    @Column(updatable = false)
+    @Column
     private ProjectRoleType role;
 
     public ProjectRole() {

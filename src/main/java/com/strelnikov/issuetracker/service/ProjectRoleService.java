@@ -20,4 +20,10 @@ public interface ProjectRoleService {
     ProjectRole save(ProjectRoleModel requestUser);
 
     List<ProjectRole> findByProjectIdAndRole(Long id, ProjectRoleType manager);
+
+    ProjectRole patchUser(Long roleId, Long id);
+
+    ProjectRole patchRole(Long roleId, ProjectRoleType role);
+
+    void deleteById(Long roleId);
 }

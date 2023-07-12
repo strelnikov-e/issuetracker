@@ -27,7 +27,7 @@ public class Project {
     @Column(name="project_key")
     private String key;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "project")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "project", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Issue> issues = new ArrayList<>();
 

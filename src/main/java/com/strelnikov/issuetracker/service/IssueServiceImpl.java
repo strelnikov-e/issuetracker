@@ -3,9 +3,9 @@ package com.strelnikov.issuetracker.service;
 import com.strelnikov.issuetracker.config.RoleService;
 import com.strelnikov.issuetracker.controller.hateoas.IssueModel;
 import com.strelnikov.issuetracker.entity.*;
-import com.strelnikov.issuetracker.exception.AccessForbiddenException;
-import com.strelnikov.issuetracker.exception.IssueNotFoundException;
-import com.strelnikov.issuetracker.exception.ProjectNotFoundException;
+import com.strelnikov.issuetracker.exception.exception.AccessForbiddenException;
+import com.strelnikov.issuetracker.exception.exception.IssueNotFoundException;
+import com.strelnikov.issuetracker.exception.exception.ProjectNotFoundException;
 import com.strelnikov.issuetracker.repository.IssueRepository;
 import com.strelnikov.issuetracker.repository.IssueRoleRepository;
 import com.strelnikov.issuetracker.repository.ProjectRepository;
@@ -148,6 +148,16 @@ public class IssueServiceImpl implements IssueService {
 			return issueRepository.findByProjectIdAndByAssigneeAndStatusNot(role, assignee, projectId, IssueStatus.DONE, pageable);
 		}
 		return issueRepository.findByProjectIdAndByAssignee(role, assignee, projectId, pageable);
+	}
+
+	@Override
+	public List<Issue> findByUserRole(IssueRoleType role, Long projectId) {
+		User user = userService.getCurrentUser();
+		if (projectId.equals(0L)) {
+			return issueRepository.findByRoleAndUserId(role, user.getId());
+		}
+		return issueRepository.findByProjectIdAndRoleAndUserId(role, user.getId(), projectId);
+
 	}
 
 	@Override

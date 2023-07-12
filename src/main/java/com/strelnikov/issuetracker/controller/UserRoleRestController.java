@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.web.firewall.RequestRejectedException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -28,7 +28,7 @@ public class UserRoleRestController {
         this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
-    @GetMapping("/project")
+    @GetMapping()
     public CollectionModel<ProjectRoleModel> all(@RequestParam Map<String, String> params, Pageable pageable) {
         Page<ProjectRole> projectRoleModels;
         Long projectId = Long.parseLong(params.getOrDefault("project", "0"));
@@ -50,19 +50,32 @@ public class UserRoleRestController {
      */
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ProjectRoleModel create(@RequestBody ProjectRoleModel requestUser) {
-        ProjectRoleModel entityModel = assembler.toModel(projectRoleService.save(requestUser));
+    public ProjectRoleModel create(@RequestBody ProjectRoleModel requestRole) {
+        ProjectRoleModel entityModel = assembler.toModel(projectRoleService.save(requestRole));
         return entityModel;
     }
 
-
-    @PatchMapping("/{id}")
+    //
+//    @PatchMapping("/{roleId}/user")
     @ResponseStatus(HttpStatus.CREATED)
-    public void patch(@PathVariable Long id, @RequestBody Map<String, Object> fields) {
-        if (fields == null || fields.isEmpty()) {
-            throw new RequestRejectedException("Bad request. This may happen if request body is empty");
+    public ProjectRoleModel assignUserToRole(@PathVariable Long roleId, @RequestParam Long id) {
+        return assembler.toModel(projectRoleService.patchUser(roleId, id));
+    }
+
+    // Change role of a user by role id.
+    @ResponseStatus(HttpStatus.CREATED)
+    @PatchMapping("/{roleId}/role")
+    public ProjectRoleModel changeRole(@PathVariable Long roleId, @RequestBody ProjectRole role) {
+        if (role.getRole().name().isEmpty() || role.getRole().name().equals("NONE")) {
+            projectRoleService.deleteById(roleId);
         }
-        ProjectRoleModel entityModel = assembler.toModel(projectRoleService.patch(id, fields));
+        return assembler.toModel(projectRoleService.patchRole(roleId, role.getRole()));
+    }
+
+    @DeleteMapping("/{roleId}")
+    public ResponseEntity<ProjectRole> delete(@PathVariable Long roleId) {
+        projectRoleService.deleteById(roleId);
+        return ResponseEntity.noContent().build();
     }
 
 }

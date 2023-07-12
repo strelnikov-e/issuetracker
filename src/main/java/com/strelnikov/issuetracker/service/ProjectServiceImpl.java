@@ -4,7 +4,7 @@ import com.strelnikov.issuetracker.config.RoleService;
 import com.strelnikov.issuetracker.controller.hateoas.ProjectModel;
 import com.strelnikov.issuetracker.controller.hateoas.UserModel;
 import com.strelnikov.issuetracker.entity.*;
-import com.strelnikov.issuetracker.exception.ProjectNotFoundException;
+import com.strelnikov.issuetracker.exception.exception.ProjectNotFoundException;
 import com.strelnikov.issuetracker.repository.ProjectRepository;
 import com.strelnikov.issuetracker.repository.ProjectRoleRepository;
 import org.springframework.data.domain.Page;
@@ -118,6 +118,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
         projectRoleRepository.deleteAllByProjectId(projectId);
         projectRepository.deleteById(projectId);
+        userService.deleteCurrentProject(projectId);
     }
 
     @Override

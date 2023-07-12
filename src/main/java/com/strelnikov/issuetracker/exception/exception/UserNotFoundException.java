@@ -1,4 +1,4 @@
-package com.strelnikov.issuetracker.exception;
+package com.strelnikov.issuetracker.exception.exception;
 
 public class UserNotFoundException extends RuntimeException {
 
