@@ -2,6 +2,36 @@
 * {font-size: 14px;}
 
 
+/* .btn-primary {
+  background-color: rgb(32, 32, 160);
+  border-color: navy;
+} */
+
+.accordion-button:not(.collapsed) {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  box-shadow: none;
+}
+
+.accordion-button:focus {
+  
+  box-shadow: 0 0 0 1px;
+}
+
+.accordion-button::after {
+  color: white;
+  
+}
+
+.overflow {
+  min-width: 800px;
+  overflow-x: scroll;
+}
+.overflow-xl {
+  min-width: 1000px;
+  overflow-x: scroll;
+}
+
 .form-control:focus {
     border-color: rgb(238, 128, 128);
     box-shadow: 0 0 0 0rem rgba(172, 22, 104, 0.25);
@@ -19,11 +49,162 @@
 }
 
 .Badge-bug {
-  bagdge-font-weight: font-weight-normal;
   color: #309ee7;
   background-color: #e4e432;
 }
 
 .nav-dropdown-item {
   color:rgba(40, 143, 59, 0.25)
+}
+
+.usercircle {
+  display: inline-block;
+    background-color: #00d53b;
+    margin: 0px;
+    border-radius: 50%;
+}
+
+.usercircle-inner {
+  color: white;
+  display: table-cell;
+  vertical-align: middle; 
+  text-align: middle;
+  text-decoration: none;
+  height: 27px;
+  width: 27px;  
+  font-size: 13px;
+}
+
+.dropdown-toggle::after {
+  display: none !important; 
+}
+
+.react-bootstrap-table table {
+  table-layout: auto;
+  }
+
+.bg-disabled {
+  --bs-bg-opacity: .8;
+  background-color: rgb(248, 248, 248) !important;
+}
+
+.bg-success {
+  --bs-bg-opacity: .8;
+  background-color: rgba(var(--bs-success-rgb), var(--bs-bg-opacity)) !important;
+}
+.bg-todo {
+  --bs-bg-opacity: .8;
+  background-color:  lightseagreen !important;
+}
+.bg-progress {
+  --bs-bg-opacity: .8;
+  background-color: mediumseagreen !important;
+}
+.bg-review {
+  --bs-bg-opacity: .8;
+  background-color: darkseagreen !important;
+}
+.bg-done {
+  --bs-bg-opacity: .8;
+  background-color: navy !important;
+}
+
+.bg-low {
+  --bs-bg-opacity: .8;
+  background-color: navy !important;
+}
+.bg-medium {
+  --bs-bg-opacity: .8;
+  background-color: darkviolet !important;
+}
+.bg-high {
+  --bs-bg-opacity: .8;
+  background-color: crimson !important;
+}
+/* .bg-success {
+  --bs-bg-opacity: .8;
+  background-color: navy !important;
+} */
+.bg-warning {
+  --bs-bg-opacity: .7;
+  background-color: rgba(var(--bs-warning-rgb), var(--bs-bg-opacity)) !important;
+}
+.bg-danger {
+  --bs-bg-opacity: .8;
+  background-color: rgba(var(--bs-danger-rgb), var(--bs-bg-opacity)) !important;
+}
+.bg-primary {
+  --bs-bg-opacity: .8;
+  background-color: rgba(var(--bs-primary-rgb), var(--bs-bg-opacity)) !important;
+}
+.bg-info {
+  --bs-bg-opacity: .8;
+  background-color: rgba(var(--bs-info-rgb), var(--bs-bg-opacity)) !important;
+}
+
+.sidenav---sidenav---_2tBP {
+  position: absolute;
+  top: 55px;
+  bottom: 100;
+  left: 0;
+  z-index: 1006;
+  min-width: 64px;
+  background: white;
+}
+
+.sidenav---sidenav-toggle---1KRjR .sidenav---icon-bar---u1f02 {
+  display: block;
+  width: 20px;
+  height: 2px;
+  margin: 0 auto;
+  background-color: black;
+  border-radius: 1px;
+  opacity: 0.7;
+}
+
+.sidenav---sidenav-nav---3tvij > .sidenav---sidenav-navitem---uwIJ-.sidenav---highlighted---oUx9u > .sidenav---navitem---9uL5T::after,
+.sidenav---sidenav-nav---3tvij > .sidenav---sidenav-navitem---uwIJ-:hover.sidenav---highlighted---oUx9u > .sidenav---navitem---9uL5T::after {
+  background: #0d6efd;
+  opacity: 1;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+  filter: alpha(opacity=20);
+}
+.sidenav---sidenav-nav---3tvij > .sidenav---sidenav-navitem---uwIJ-.sidenav---highlighted---oUx9u.sidenav---expanded---1KdUL > .sidenav---navitem---9uL5T::after,
+.sidenav---sidenav-nav---3tvij > .sidenav---sidenav-navitem---uwIJ-:hover.sidenav---highlighted---oUx9u.sidenav---expanded---1KdUL > .sidenav---navitem---9uL5T::after {
+  background: #0d6efd;
+  opacity: 0.25;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=25)";
+  filter: alpha(opacity=25);
+}
+.sidenav---sidenav-nav---3tvij > .sidenav---sidenav-navitem---uwIJ-.sidenav---highlighted---oUx9u.sidenav---selected---1EK3y.sidenav---expanded---1KdUL > .sidenav---navitem---9uL5T::after,
+.sidenav---sidenav-nav---3tvij > .sidenav---sidenav-navitem---uwIJ-:hover.sidenav---highlighted---oUx9u.sidenav---selected---1EK3y.sidenav---expanded---1KdUL > .sidenav---navitem---9uL5T::after {
+  background: #0d6efd;
+  opacity: 0.2;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+  filter: alpha(opacity=20);
+}
+.sidenav---sidenav-nav---3tvij > .sidenav---sidenav-navitem---uwIJ-:hover > .sidenav---navitem---9uL5T .sidenav---navicon---3gCRo,
+.sidenav---sidenav-nav---3tvij > .sidenav---sidenav-navitem---uwIJ-:hover > .sidenav---navitem---9uL5T .sidenav---navtext---1AE_f {
+  color: #0d6efd;
+}
+.sidenav---sidenav-nav---3tvij > .sidenav---sidenav-navitem---uwIJ-.sidenav---highlighted---oUx9u > .sidenav---navitem---9uL5T .sidenav---navicon---3gCRo,
+.sidenav---sidenav-nav---3tvij > .sidenav---sidenav-navitem---uwIJ-.sidenav---highlighted---oUx9u > .sidenav---navitem---9uL5T .sidenav---navtext---1AE_f {
+  color: white;
+}
+.sidenav---sidenav-nav---3tvij > .sidenav---sidenav-navitem---uwIJ-:hover > .sidenav---navitem---9uL5T .sidenav---navicon---3gCRo > *,
+.sidenav---sidenav-nav---3tvij > .sidenav---sidenav-navitem---uwIJ-:hover > .sidenav---navitem---9uL5T .sidenav---navtext---1AE_f > * {
+  color: #0d6efd;;
+}
+
+.sidenav---sidenav-nav---3tvij > .sidenav---sidenav-navitem---uwIJ-.sidenav---highlighted---oUx9u > .sidenav---navitem---9uL5T .sidenav---navicon---3gCRo > *,
+.sidenav---sidenav-nav---3tvij > .sidenav---sidenav-navitem---uwIJ-.sidenav---highlighted---oUx9u > .sidenav---navitem---9uL5T .sidenav---navtext---1AE_f > * {
+  color:white
+}
+.sidenav---sidenav-nav---3tvij > .sidenav---sidenav-navitem---uwIJ- > .sidenav---navitem---9uL5T .sidenav---navicon---3gCRo,
+.sidenav---sidenav-nav---3tvij > .sidenav---sidenav-navitem---uwIJ- > .sidenav---navitem---9uL5T .sidenav---navtext---1AE_f {
+  color: black;
+}
+.sidenav---sidenav-nav---3tvij > .sidenav---sidenav-navitem---uwIJ- > .sidenav---navitem---9uL5T .sidenav---navicon---3gCRo > *,
+.sidenav---sidenav-nav---3tvij > .sidenav---sidenav-navitem---uwIJ- > .sidenav---navitem---9uL5T .sidenav---navtext---1AE_f > * {
+  color: black;
 }

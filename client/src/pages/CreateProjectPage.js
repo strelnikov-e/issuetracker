@@ -1,5 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
@@ -13,8 +14,14 @@ import { UserBadge } from "../components/UserBadge";
 import { useAuth } from "../hooks/useAuth";
 import { useFetchUsers } from "../utils/Repositories";
 
-export default function ProjectDetails() {
-  const { user } = useAuth();
+
+import { useChangeProject, useFetchProjects } from "../utils/Repositories";
+import { ProjectContext } from "../App";
+import { useLocalStorage } from "../hooks/useLocalStorage";
+
+export default function CreateProjectPage() {
+  const { currentProject, setCurrentProject } = useContext(ProjectContext);
+  const [user, setUser] = useLocalStorage("user");
   let initialFormState = {
     id: "",
     name: "",
@@ -30,23 +37,16 @@ export default function ProjectDetails() {
   const [project, setProject] = useState(initialFormState);
   const navigate = useNavigate();
   const { id } = useParams();
-  const { data, isLoading, error } = useFetchUsers(id);
-
-  const fetch = async () => {
-    const response = await axios.get(`/api/projects/${id}`);
-    return response;
-  };
-
-  useEffect(() => {
-    if (id !== "new") {
-      fetch()
-        .then((data) => setProject(data.data));
-    }
-  }, [id, setProject]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setProject({ ...project, [name]: value });
+  };
+
+  const HandleChooseProject = (project) => {
+    setCurrentProject(project);
+    useChangeProject(project.id);
+    setUser({ ...user, currentProject: project });
   };
 
   const handleSubmit = async (event) => {
@@ -55,53 +55,17 @@ export default function ProjectDetails() {
     if (project.id) {
       axios.put(`/api/projects/${project.id}`, project);
     } else {
-      axios.post(`/api/projects`, project);
+      axios.post(`/api/projects`, project).then(data => HandleChooseProject(data.data));
     }
 
     setProject(initialFormState);
     navigate("/projects");
   };
 
-  const title = (
-    <h4 className="mb-4">{project.id ? "Edit project" : "Create project"}</h4>
-  );
-
-  const ManagerDropdown = () => {
-    if (isLoading) return <p>Loading...</p>;
-
-    return (
-      <>
-        {data?._embedded?.userModelList.map((u) => (
-          <Dropdown.Item
-            key={u.id}
-            onClick={() => setProject({ ...project, manager: u })}
-          >
-            <UserBadge user={u}></UserBadge>
-          </Dropdown.Item>
-        ))}
-      </>
-    );
-  };
-
-  const AdminDropdown = () => {
-    if (isLoading) return <p>Loading...</p>;
-
-    return (
-      <>
-        {data?._embedded?.userModelList.map((u) => (
-          <Dropdown.Item
-            key={u.id}
-            onClick={() => setProject({ ...project, admin: u })}
-          >
-            <UserBadge user={u}></UserBadge>
-          </Dropdown.Item>
-        ))}
-      </>
-    );
-  };
+  const title = <h4 className="mb-4">Create project</h4>;
 
   return (
-    <Form className="" onSubmit={handleSubmit}>
+    <Form onSubmit={handleSubmit}>
       {title}
 
       <Row className="g-5 mb-4">
@@ -157,16 +121,8 @@ export default function ProjectDetails() {
                     ? "Administrators:"
                     : "Administrator:"}
                 </Col>
-                <Col className="">
-                  {Array.from(project.admins).length === 0 ? (
-                    <UserBadge user={draftUser}></UserBadge>
-                  ) : (
-                    project.admins.map((user) => (
-                      <div key={user.id} className="py-1">
-                        <UserBadge user={user}></UserBadge>
-                      </div>
-                    ))
-                  )}
+                <Col>
+                  <UserBadge user={user}></UserBadge>
                   {/* {project.admins.map((user) => (
                 <div key={user.id} className="mb-2">
                 <UserBadge user={user}></UserBadge>
@@ -174,30 +130,19 @@ export default function ProjectDetails() {
               ))} */}
                 </Col>
               </Row>
-              <Row className="border-top border-bottom py-3">
-                <Col className="py-1 align-middle col-5">
-                  {Array.from(project.managers).length > 1
-                    ? "Managers:"
-                    : "Manager:"}
+              <Row className="border-top py-3">
+                <Col className="col-5">
+                  <div className="py-1 align-middle">
+                    {Array.from(project.managers).length > 1
+                      ? "Managers:"
+                      : "Manager:"}
+                  </div>
                 </Col>
                 <Col className="">
-                  {Array.from(project.managers).length === 0 ? (
-                    <UserBadge user={draftUser}></UserBadge>
-                  ) : (
-                    project.managers.map((user) => (
-                      <div key={user.id} className="py-1">
-                        <UserBadge user={user}></UserBadge>
-                      </div>
-                    ))
-                  )}
+                  <UserBadge user={draftUser}></UserBadge>
                 </Col>
               </Row>
-              <Row className="py-2 align-middle">
-                <Col className="col-5">Created:</Col>
-                <Col className="text-muted">
-                  {dayjs(project.startDate).format("MMM D, YYYY")}
-                </Col>
-              </Row>
+            
             </Card.Body>
           </Card>
         </Col>

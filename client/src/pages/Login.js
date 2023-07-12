@@ -1,17 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 
-import { setAuthToken } from "../utils/SetGlobalAuthToken";
-import useAuth from "../utils/hooks/useAuth";
+import { useAuth } from "../hooks/useAuth";
 import "../css/Login.css";
+import { setAuthToken } from "../utils/SetGlobalAuthToken";
+import { InfoCircleFill } from "react-bootstrap-icons";
+import { Stack } from "react-bootstrap";
 
 const Login = () => {
-  const { setAuth } = useAuth();
-
+  const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/boards";
@@ -32,37 +33,37 @@ const Login = () => {
     return email.length > 0 && password.length > 0;
   }
 
+  // send email and password to backend and recieve token
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setAuthToken(null);
+    setAuthToken("")
+    const data = { email, password }
     try {
       const response = await axios.post(
         "http://localhost:8080/api/token",
-        { email, password },
+        data,
         {
           headers: { "Content-Type": "application/json" },
         }
       );
-      console.log(JSON.stringify(response?.data));
-      const accessToken = response?.data;
-      // implement roles
-      const roles = null;
-      setAuth({ email, password, accessToken });
-      setAuthToken(accessToken);
-      localStorage.setItem("email", email);
-      localStorage.setItem("password", password);
-      localStorage.setItem("accessToken", accessToken);
+      // console.log(JSON.stringify(response?.data));
+      data["token"] = response?.data;
+      setAuthToken(response?.data);
 
-      setemail("");
-      setPassword("");
-
+      const getUser = await axios.get("http://localhost:8080/api/users/details");
+      const user = {...getUser.data, token: response?.data}
+      
+      login(user);
       navigate(from, { replace: true });
+
     } catch (err) {
+      // console.log(err)
       if (!err?.response) {
         setErrMsg("No response from server");
       } else if (err.response?.status === 400) {
         setErrMsg("Missing email or Password");
       } else if (err.response?.status === 401) {
+        // console.log("error 401")
         setErrMsg("Wrong email or password");
       } else {
         setErrMsg("Login failed");
@@ -138,7 +139,23 @@ const Login = () => {
             </span>
           </p>
         </Card.Body>
+        <Stack direction="horizontal" gap={3} className="px-3 py-5">
+        <div className="">
+          <InfoCircleFill size={20} color="RebeccaPurple" />
+        </div>{" "}
+        <div className="text-secondary">
+          To test application you can create account OR user one of the following test users:
+          <ul className="mt-2">
+            <li>ryan@test.com - Administrator</li>
+            <li>jared@test.com - Manager (Recommended)</li>
+            <li>sandra@test.com - Viewer</li>
+          </ul>
+            Password for all test users: password
+        </div>
+      </Stack>
       </Card>
+
+      
     </div>
   );
 };

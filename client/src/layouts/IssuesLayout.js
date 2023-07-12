@@ -1,37 +1,95 @@
-import { Outlet, useNavigate, useLocation, useParams } from "react-router-dom";
+import { Outlet, redirect, useNavigate } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { NavDropdown } from "react-bootstrap";
 import { Button } from "react-bootstrap";
-import { useContext } from "react";
-import { ProjectContext } from "../App";
+import { Row, Col } from "react-bootstrap";
+
+import { CreateProject, ProjectContext } from "../App";
+import { ProjectsDropdown } from "../components/AppNavbar";
+import Breadcrumbs from "../components/Breadcrumbs";
+import { IssuesSideNavBar } from "../components/Sidebar";
 
 export default function IssuesLayout() {
+  const { currentProject } = useContext(ProjectContext);
+  const navigate = useNavigate();
 
-    const { state } = useLocation();
-    const { currentProject } = useContext(ProjectContext);
-    
-    const navigate = useNavigate();
-    const project = state? state: {name: 'All projects', projectId: 0}
- 
+  const [windowSize, setWindowSize] = useState([window.innerWidth]);
 
+  useEffect(() => {
+    const handleWindowResize = () => {
+      setWindowSize([window.innerWidth]);
+    };
+
+    window.addEventListener("resize", handleWindowResize);
+
+    return () => {
+      window.removeEventListener("resize", handleWindowResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (
+      !currentProject ||
+      currentProject.id === null ||
+      currentProject.id === 0
+    ) {
+      navigate("/projects");
+    }
+  }, []);
+
+  if (
+    !currentProject ||
+    currentProject.id === null ||
+    currentProject.id === 0
+  ) {
     return (
-        <div>
-            <div className="container-lg">
-                <h4 className="mb-3">{currentProject?.name && "Project"}</h4>
+      <div className="container-lg p-5">
+        <CreateProject />
+      </div>
+    );
+  }
 
-                <div className="d-grid gap-2 d-md-block">
-                    <form className="row align-items-center mb-5">
-                        <div className="col-sm-5 md-4 col-xl-3 mb-2">
-                            <input className="form-control" type="search" placeholder="Search" aria-label="Search"/>
-                        </div>
-                        <div className="col">
-                            <div className="d-flex justify-content-end">
-                                <Button onClick={() => navigate('/issues/new', { state: { projectId: currentProject.id}})} className="btn mb-2 justify-content-center">Create</Button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+  const Title = () => {
+    if (!currentProject) {
+      return "Loading";
+    }
+    const key = (
+      <span className="text-muted fs-4 me-2">{currentProject?.key}</span>
+    );
+    const title = currentProject?.name;
+    return (
+      <>
+        {key} {title}
+      </>
+    );
+  };
 
-                <Outlet />
+  return (
+    <>
+      <Row>
+        <Col className="col-2 col-md-1">
+          {windowSize[0] > 767 && <IssuesSideNavBar />}
+        </Col>
+        <Col className="col-md-11">
+          <div className="fluid">
+            <Breadcrumbs />
+
+            <NavDropdown
+              id="nav-projects-dropdown"
+              title={<Title />}
+              menuVariant="light"
+              className="btn btn-outline-light text-dark border-0 fs-4 mb-4"
+            >
+              <ProjectsDropdown divider={false} />
+            </NavDropdown>
+
+            <div className="">
+              <Outlet />
+              <div></div>
             </div>
-        </div>
-    )
+          </div>
+        </Col>
+      </Row>
+    </>
+  );
 }

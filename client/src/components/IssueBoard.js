@@ -11,17 +11,16 @@ import Form from "react-bootstrap/Form";
 import { Droppable } from "react-beautiful-dnd";
 import { Draggable } from "react-beautiful-dnd";
 import { Container } from "react-bootstrap";
+import { Col } from "react-bootstrap";
+import { Plus } from "react-bootstrap-icons";
 
-function IssueBoard({ data, status, project }) {
-
-
+function IssueBoard({ data, status, project, isLoading, error, url }) {
   let initialFormState = {
     name: "",
     project,
     status,
   };
   const queryClient = useQueryClient();
-  const queryKey = `/api/issues?projectId=${project.id}`
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
   const [draftIssue, setDraftIssue] = useState(initialFormState);
 
@@ -40,15 +39,15 @@ function IssueBoard({ data, status, project }) {
     mutationFn: () => {
       return axios.post(`/api/issues`, draftIssue);
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [url] });
       setDraftIssue(initialFormState);
     },
   });
 
   return (
-    <div  className="col">
-      <Card style={{ width: "50" }} className="bg-light" key={status}>
+    <Col className="px-2 py-4">
+      <Card style={{ width: "250px" }} className="bg-light" key={status}>
         <Card.Body className="px-1">
           <Card.Subtitle className="bg-light mb-2 px-2">{status}</Card.Subtitle>
           <Droppable droppableId={draftIssue.status}>
@@ -56,18 +55,19 @@ function IssueBoard({ data, status, project }) {
               <ListGroup {...provided.droppableProps} ref={provided.innerRef}>
                 {data.map((issue, index) => (
                   <Draggable
+                    isDragDisabled={!issue._links.update}
                     draggableId={issue.id.toString()}
                     index={index}
                     key={issue.id}
                   >
                     {(provided) => (
                       <Container
-                        className="mb-1 border rounded bg-white"
+                        className={"mb-1 border rounded " + (!issue._links.update? "bg-disabled" : "bg-white")}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                         ref={provided.innerRef}
                       >
-                        <IssueCard data={issue} index={index} key={issue.id} />
+                        <IssueCard data={issue} index={index} key={issue.id} url={url} />
                       </Container>
                     )}
                   </Draggable>
@@ -81,7 +81,7 @@ function IssueBoard({ data, status, project }) {
           className="btn btn-light text-muted text-start"
           onClick={() => setIsCreateFormOpen(!isCreateFormOpen)}
         >
-          + Create issue
+          <Plus size={24} /> <span className="align-middle">Create issue</span>
         </Button>
         <Collapse in={isCreateFormOpen}>
           <Form
@@ -99,7 +99,7 @@ function IssueBoard({ data, status, project }) {
           </Form>
         </Collapse>
       </Card>
-    </div>
+    </Col>
   );
 }
 

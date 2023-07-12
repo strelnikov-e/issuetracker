@@ -85,11 +85,11 @@ export default function Login() {
     }
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/signup",
+        "http://localhost:8080/api/users",
         JSON.stringify({ email, password: pwd, firstName, lastName, company }),
         {
           headers: { "Content-Type": "application/json" },
-          withCredentials: true,
+          
         }
       );
       setFirstName('');
@@ -98,7 +98,7 @@ export default function Login() {
       setEmail('');
       setPwd('')
       setMatchPwd('');
-      window.location.href = "/";
+      window.location.href = "/login";
     } catch (err) {
       if (!err?.response) {
         setErrMsg("No response from server");

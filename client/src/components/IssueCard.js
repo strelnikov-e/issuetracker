@@ -2,33 +2,21 @@ import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
-import Badge from "react-bootstrap/Badge";
 import Dropdown from "react-bootstrap/Dropdown";
 import Stack from "react-bootstrap/esm/Stack";
+import { DropdownButton } from "react-bootstrap";
 
 import { PriorityBadge } from "./PriorityBadge.js";
+import { UserBadgeSmOnly } from "./UserBadge.js";
+import { ThreeDots } from "react-bootstrap-icons";
 
 function IssueCard({
-  data: { id, name, key, type, priority, assignee, status, project },
+  data: { id, name, key, type, priority, assignee, status, project, _links, url },
   index,
 }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const url = `/api/issues?projectId=${project.id}`;
 
-  // const issue = data.data;
-  const threeDots = (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      fill="currentColor"
-      className="bi bi-three-dots"
-      viewBox="0 0 16 16"
-    >
-      <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
-    </svg>
-  );
 
   const handleDelete = useMutation({
     mutationFn: () => {
@@ -42,38 +30,33 @@ function IssueCard({
   return (
     <>
       <Stack direction="horizontal">
-        <div className="me-auto">
+        <div className="me-auto p-1 mb-2">
           <span className="align-middle text-muted">
             <PriorityBadge priority={priority} />
             <small> {key}</small>
           </span>
         </div>
-        <Dropdown>
-          <Dropdown.Toggle
-            variant="light"
-            id="dropdown-basic"
-          ></Dropdown.Toggle>
-
-          <Dropdown.Menu>
-            <Dropdown.Item
-              onClick={() =>
-                navigate(`/issues/${id}`, { state: { projectId: project.id } })
-              }
-            >
-              Edit
-            </Dropdown.Item>
-            <Dropdown.Item onClick={() => handleDelete.mutate()}>
-              Delete
-            </Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
+        <DropdownButton
+            variant="outline-secondary border-0"
+            className="border-0"
+            title=<ThreeDots size={20} />
+          >
+            <Dropdown>
+              <Dropdown.Item onClick={() => navigate("/issues/" + id)} className={!_links.update && "disabled"}>
+                Edit
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => handleDelete.mutate()} className={!_links.delete && "disabled"}>
+                Remove
+              </Dropdown.Item>
+            </Dropdown>
+          </DropdownButton>
+          {/* className={!project._links.delete && "disabled"} */}
+        
       </Stack>
-      <p className="">{name}</p>
+      <p className={!_links.update? "text-secondary": ""}>{name}</p>
       <Stack direction="horizontal">
         <small className="text-muted me-auto">{type}</small>
-        <Badge pill bg="secondary">
-          {assignee}
-        </Badge>
+        <UserBadgeSmOnly user={assignee} />
       </Stack>
     </>
   );

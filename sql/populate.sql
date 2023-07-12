@@ -46,7 +46,7 @@ VALUES
         
         (3, 3, 'ADMIN'),
         (2, 3, 'MANAGER'),
-        (1, 3, 'VIEwER');
+        (1, 3, 'VIEWER');
         
 INSERT INTO `issues_roles` (`user_id`, `issue_id`, `role`)
 VALUES
@@ -102,7 +102,7 @@ VALUES
         (7, 21, 'ASSIGNEE'),
         (3, 22, 'ASSIGNEE'),
         (5, 23, 'ASSIGNEE'),
-        (3, 24, 'ASSIGNEE'),
+        (4, 24, 'ASSIGNEE'),
         (7, 25, 'ASSIGNEE'),
         (4, 26, 'ASSIGNEE'),
         (3, 27, 'ASSIGNEE'),

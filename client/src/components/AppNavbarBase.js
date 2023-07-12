@@ -1,54 +1,55 @@
-import React, { useState, useEffect, useContext } from "react";
-import { NavLink } from "react-router-dom";
+import React from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import useAuth from "../utils/hooks/useAuth";
-import { setAuthToken } from "../utils/SetGlobalAuthToken";
-import { ProjectContext } from "../App";
+import { Dropdown } from "react-bootstrap";
+import DropdownButton from "react-bootstrap/DropdownButton";
+
+import Logo from "../logo.svg"
+
 import AppNavbar from "./AppNavbar";
 
+import { useAuth } from "../hooks/useAuth";
+import { UserBadgeOnly } from "./UserBadge";
+
 function AppNavbarBase() {
-  const { auth, setAuth } = useAuth();
-  const [isOpen, setIsOpen] = useState(false);
-  const [isAuth, setIsAuth] = useState(auth?.email ? true : false);
-  const { currentProject, setCurrentProject } = useContext(ProjectContext);
-
-  const toggle = () => setIsOpen(!isOpen);
-
-  const handleLogout = () => {
-    setAuth({});
-    setAuthToken({});
-    localStorage.setItem("accessToken", "");
-    localStorage.setItem("email", "");
-    localStorage.setItem("password", "");
-    setCurrentProject(null)
-  };
-
-  useEffect(() => {
-    setIsAuth(auth?.email ? true : false);
-  }, [auth]);
+  const { user, logout } = useAuth();
 
   return (
-    <Navbar expand="md" className="shadow">
+    <Navbar bg="light" data-bs-theme="primary" expand="md" variant="light" className="shadow-sm border-bottom" style={{height: "55px"}}>
       <Container>
         <Navbar.Brand className="fs-4" href="/">
-          issue-tracker
+
+        <img src={Logo} alt="logo" width={27} height={27}/>
+          <span className="ms-1 h4 fw-normal">issue</span><span className="h4 fw-semibold">Tracker</span> 
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto fs-5" variant="underline">
-            {isAuth && <AppNavbar />}
+        <Navbar.Collapse id="basic-navbar-nav" className="">
+          <Nav className="me-auto fs-5">
+            {user && <AppNavbar />}
           </Nav>
           <Nav>
-            {!isAuth ? (
-              <NavLink className="nav-link fs-5" to="login">
+            {!user ? (
+              <NavLink className="btn btn-outline-light text-dark border-0 fs-5" to="login">
                 Login
               </NavLink>
             ) : (
-              <NavLink className="nav-link fs-5" onClick={handleLogout}>
-                Logout
-              </NavLink>
+              <DropdownButton
+                variant="outline-light border-0"
+                align="end"
+                className="border-0"
+                title=<span className="align-middle text-secondary">
+                  <UserBadgeOnly user={user} />
+                </span>
+              >
+              <Dropdown.Header>Welcome {user.firstName + " " + user.lastName}</Dropdown.Header>
+                <Dropdown.Item>
+                  <div onClick={logout}>
+                    Logout
+                  </div>
+                </Dropdown.Item>
+              </DropdownButton>
             )}
           </Nav>
         </Navbar.Collapse>

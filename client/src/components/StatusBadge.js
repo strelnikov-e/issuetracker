@@ -3,23 +3,34 @@ import { Badge } from "react-bootstrap";
 export const StatusBadge = (props) => {
     const status = props.status;
   return (
-      <Badge
-        pill
-        text=""
-        bg={
-          status === "TODO"
-            ? 'primary'
-            : status === "INPROGRESS"
-            ? "danger" 
-            : status === "INREVIEW"
-            ? "success"
-            : "dark"
-        }
-      >
+      <div className={status === "DONE" ? "text-secondary" : ""}>
         {StatusConverter(status)}
-      </Badge>
+        </div>
+
   );
 }
+
+// export const StatusBadge = (props) => {
+//   const status = props.status;
+// return (
+//     <Badge
+//       pill
+//       text=""
+//       bg="light"
+//       bg={
+//         status === "TODO"
+//           ? 'todo'
+//           : status === "INPROGRESS"
+//           ? "progress" 
+//           : status === "INREVIEW"
+//           ? "review"
+//           : "secondary"
+//       }
+//     >
+//       {StatusConverter(status)}
+//     </Badge>
+// );
+// }
 
 export const StatusConverter = (props) => {
 let status = null;
@@ -30,7 +41,7 @@ let status = null;
       case "DONE":
         status = "Done";
         break;
-      case "REVIEW":
+      case "INREVIEW":
         status = "In review";
         break;
       default: 

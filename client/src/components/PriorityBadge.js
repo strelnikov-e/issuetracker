@@ -3,14 +3,14 @@ import { Badge } from "react-bootstrap";
 export const PriorityBadge = (props) => {
   const priority = props.priority;
   return (
-      <Badge
+      <Badge className=""
         pill
         bg={
           priority === "MEDIUM"
-            ? 'warning'
+            ? 'medium'
             : priority === "HIGH"
-            ? "danger"
-            : "success"
+            ? "high"
+            : "low"
         }
       >
         {PriorityConverter(priority)}
