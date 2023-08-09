@@ -117,7 +117,7 @@ VALUES
         "Dragt project for testing",
         "2023-01-18", 2),
         ("IAM","Investment activity monitor",
-        "Dragt project for testing",
+        "Draft project for testing",
         "2023-06-23", 0);
         
 INSERT INTO `issues` (`issue_key`, `name`,`description`,`status`, `type`, `priority`, `start_date`, `due_date`, `project_id`, `parent_issue`)

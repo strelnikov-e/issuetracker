@@ -28,7 +28,7 @@ public class UserRoleRestController {
         this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
-    @GetMapping()
+    @GetMapping
     public CollectionModel<ProjectRoleModel> all(@RequestParam Map<String, String> params, Pageable pageable) {
         Page<ProjectRole> projectRoleModels;
         Long projectId = Long.parseLong(params.getOrDefault("project", "0"));

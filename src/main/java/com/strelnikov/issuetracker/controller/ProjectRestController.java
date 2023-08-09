@@ -69,6 +69,7 @@ public class ProjectRestController {
     Create a new project. Request should contain name of the project.
     User will get an ADMIN role for the project.
      */
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping
     public ResponseEntity<?> createProject(@Valid @RequestBody ProjectModel project) {
         LOG.debug("POST request to create project: '{}'", project);
@@ -82,6 +83,7 @@ public class ProjectRestController {
     Update project by ID passed as path variable.
     User should have role of MANAGER or above for the project.
      */
+    @CrossOrigin(origins = "http://localhost:3000")
     @PutMapping("/{projectId}")
     @PreAuthorize("@RoleService.hasAnyRoleByProjectId(#projectId, @ProjectRole.MANAGER)")
     public ResponseEntity<?> updateProject(@PathVariable Long projectId, @RequestBody ProjectModel project) {
@@ -97,6 +99,7 @@ public class ProjectRestController {
     Delete project by ID passed as path variable.
     User should have role of ADMIN for the project.
      */
+    @CrossOrigin(origins = "http://localhost:3000")
     @DeleteMapping("/{projectId}")
     @PreAuthorize("@RoleService.hasAnyRoleByProjectId(#projectId, @ProjectRole.ADMIN)")
     public ResponseEntity<?> deleteProject(@PathVariable Long projectId) {
