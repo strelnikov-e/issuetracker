@@ -17,7 +17,8 @@ public class HomeController {
 
     @GetMapping
     public String welcome() {
-        return "Welcome to Issue tracker" ;
+
+        return "Welcome to Issue tracker!";
     }
 
     @GetMapping("/api")
