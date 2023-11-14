@@ -17,8 +17,7 @@ public class HomeController {
 
     @GetMapping
     public String welcome() {
-
-        return "Welcome to Issue tracker!";
+        return "Welcome to Issue tracker!<br><a href=/swagger-ui/index.html#>REST API endpoints</a>";
     }
 
     @GetMapping("/api")
